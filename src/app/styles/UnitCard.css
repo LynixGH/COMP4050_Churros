@@ -17,4 +17,5 @@
 /* Unit Card Paragraphs */
 .unit-card p {
   margin: 5px 0;
+  cursor: pointer;
 }

@@ -5,7 +5,8 @@ import Assignments from '@/app/components/Assignment'; // Import the Assignments
 import Tutors from '@/app/components/TutorList'; // Import the Tutors component
 import axios from 'axios';
 import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
-import '@/app/styles/unitDashboard.css' // Import the CSS file
+import '@/app/styles/unitDashboard.css'; // Import the CSS file
+
 
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
