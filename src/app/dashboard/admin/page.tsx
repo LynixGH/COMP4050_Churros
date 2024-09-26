@@ -1,6 +1,6 @@
 const admin = () => {
     return (
-      <div className=''>adminPage</div>
+      <div className=''>DISPLAY UNIT LIST</div>
     )
   }
   
