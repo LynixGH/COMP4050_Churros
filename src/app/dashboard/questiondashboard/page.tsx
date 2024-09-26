@@ -1,7 +1,7 @@
-const questiondashboard = () => {
+const questionDashboard = () => {
     return (
       <div className=''>DISPLAY UNIT LIST, create unit button</div>
     )
   }
   
-  export default questiondashboard
+  export default questionDashboard

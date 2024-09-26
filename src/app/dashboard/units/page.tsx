@@ -39,7 +39,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
   );
 };
 
-const UnitDashboard: React.FC = () => {
+const unitDashboard: React.FC = () => {
   const unitName = "CS101"; // Example unit name
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
@@ -215,4 +215,4 @@ const styles = {
   },
 };
 
-export default UnitDashboard;
+export default unitDashboard;
