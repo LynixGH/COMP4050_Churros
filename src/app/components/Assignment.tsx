@@ -31,6 +31,8 @@ const Assignments: React.FC = () => {
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode);
+    setSelectedAssignment(null); // Reset selected assignment when toggling edit mode
+    setNewName(''); // Clear the new name input
   };
 
   const handleEditClick = (assignment: Assignment) => {
@@ -95,15 +97,13 @@ const Assignments: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <button onClick={toggleEditMode} style={styles.editButton}>
-        {isEditMode ? 'Cancel Edit' : 'Edit Assignments'}
-      </button>
-
       {assignments.map((assignment) => (
         <div key={assignment.project_id} style={styles.box}>
-          <h3>{assignment.project_name || 'Unnamed Project'}</h3>
-          <p>Unit Code: {assignment.unit_code}</p>
-
+          <div style={styles.assignmentInfo}>
+            <h3>{assignment.project_name || 'Unnamed Project'}</h3>
+            <p>Unit Code: {assignment.unit_code}</p>
+          </div>
+          
           {isEditMode && (
             <div style={styles.actions}>
               <button style={styles.actionButton} onClick={() => handleEditClick(assignment)}>Edit</button>
@@ -112,6 +112,17 @@ const Assignments: React.FC = () => {
           )}
         </div>
       ))}
+
+      {/* Move the Edit button to the bottom of the section */}
+      {isEditMode ? (
+        <button onClick={toggleEditMode} style={styles.cancelButton}>
+          Cancel Editing
+        </button>
+      ) : (
+        <button onClick={toggleEditMode} style={styles.editButton}>
+          Edit Assignments
+        </button>
+      )}
 
       {/* Edit Modal */}
       {selectedAssignment && (
@@ -150,9 +161,15 @@ const styles = {
     backgroundColor: '#f9f9f9',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  assignmentInfo: {
+    flex: 1, // Allow the assignment info to take available space
   },
   editButton: {
-    marginBottom: '10px',
+    marginTop: '10px',
     padding: '8px 12px',
     backgroundColor: '#007bff',
     color: '#fff',
@@ -161,10 +178,11 @@ const styles = {
     cursor: 'pointer',
   },
   actions: {
-    marginTop: '10px',
+    display: 'flex',
+    justifyContent: 'flex-end', // Align buttons to the far right
+    gap: '10px', // Space between buttons
   },
   actionButton: {
-    marginRight: '10px',
     padding: '8px 12px',
     backgroundColor: '#dc3545', // Red for delete button
     color: '#fff',
