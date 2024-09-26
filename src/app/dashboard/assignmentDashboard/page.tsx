@@ -14,6 +14,7 @@ const AssignmentDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
   const [showTemplate, setShowTemplate] = useState<boolean>(false); // State to manage overlay visibility
+  const [templateSaved, setTemplateSaved] = useState<boolean>(false); // State to track if the template has been saved
 
   useEffect(() => {
     fetchSubmissions();
@@ -83,6 +84,11 @@ const AssignmentDashboard: React.FC = () => {
     }
   };
 
+  // Function to reset template saved state
+  const resetTemplateSaved = () => {
+    setTemplateSaved(false);
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">{unitName} Dashboard</h1>
@@ -107,10 +113,15 @@ const AssignmentDashboard: React.FC = () => {
         <h3 className="text-lg font-semibold">Submissions</h3>
         <div>
           <button 
-            onClick={() => setShowTemplate(true)} // Show the QuestionTemplate overlay
+            onClick={() => {
+              setShowTemplate(true);
+              if (!templateSaved) {
+                setTemplateSaved(true); // Set template saved to true when opening for the first time
+              }
+            }} 
             className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
           >
-            Add Question Template
+            {templateSaved ? 'Edit Question Template' : 'Add Question Template'}
           </button>
           <button
             onClick={handleGenerateQuestions} 
@@ -141,7 +152,7 @@ const AssignmentDashboard: React.FC = () => {
                     checked={selectedSubmissions.length === submissions.length}
                   />
                 </th>
-                <th className="border px-4 py-2">Submission ID</th>
+                <th className="border px-1 py-2">Submission ID</th>
                 <th className="border px-4 py-2">File Name</th>
                 <th className="border px-4 py-2">Status</th>
               </tr>
@@ -166,7 +177,10 @@ const AssignmentDashboard: React.FC = () => {
         </div>
       )}
 
-      {showTemplate && <QuestionTemplate onClose={() => setShowTemplate(false)} />} {/* Render the overlay */}
+      {showTemplate && <QuestionTemplate onClose={() => {
+        setShowTemplate(false);
+        resetTemplateSaved(); // Reset the template saved state when closing
+      }} />} {/* Render the overlay */}
     </div>
   );
 };
