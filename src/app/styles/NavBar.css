@@ -1,0 +1,71 @@
+/* Navbar.css */
+
+.navbar {
+    padding: 1rem; /* Equivalent to p-4 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.search-bar {
+    display: none; /* Hidden by default */
+    gap: 0.5rem; /* Equivalent to gap-2 */
+    border-radius: 9999px; /* Fully rounded */
+    padding: 0.5rem; /* Equivalent to px-2 */
+}
+
+.search-bar.visible {
+    display: flex; /* Show on medium screens and up */
+}
+
+.search-input {
+    width: 200px; /* Equivalent to w-[200px] */
+    padding: 0.5rem; /* Equivalent to p-2 */
+    background-color: transparent; /* bg-transparent */
+    outline: none;
+    transition: color 0.3s; /* Transition for input text color */
+}
+
+/* Light mode styles */
+.ring-light {
+    border: 1.5px solid #D1D5DB; /* Equivalent to ring-gray-300 */
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem; /* Equivalent to gap-1 */
+}
+
+.text-light {
+    color: black; /* Default text color */
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .navbar {
+        background-color: #2c2c2c; /* Dark background for navbar */
+        color: white; /* Light text color for navbar */
+    }
+
+    .search-bar {
+        border: 1.5px solid #4B5563; /* Dark border */
+    }
+
+    .search-input {
+        color: white; /* Light text color for input */
+    }
+
+    .search-input::placeholder {
+        color: #bbb; /* Light placeholder text */
+    }
+
+    .ring-light {
+        border: 1.5px solid #4B5563; /* Dark border for ring */
+    }
+
+    .text-light {
+        color: white; /* Text color for dark mode */
+    }
+}

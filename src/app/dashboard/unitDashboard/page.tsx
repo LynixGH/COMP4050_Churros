@@ -5,6 +5,7 @@ import Assignments from '@/app/components/Assignment'; // Import the Assignments
 import Tutors from '@/app/components/TutorList'; // Import the Tutors component
 import axios from 'axios';
 import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
+import '@/app/styles/unitDashboard.css' // Import the CSS file
 
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
@@ -20,26 +21,26 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
   if (!isOpen) return null;
 
   return (
-    <div style={styles.modalOverlay}>
-      <div style={styles.modalContent}>
+    <div className="modal-overlay">
+      <div className="modal-content">
         <h2>Create New Project</h2>
         <input
           type="text"
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
           placeholder="Enter project name"
-          style={styles.input}
+          className="input"
         />
-        <div style={styles.modalActions}>
-          <button onClick={handleSubmit} style={styles.createButton}>Create</button>
-          <button onClick={onClose} style={styles.cancelButton}>Cancel</button>
+        <div className="modal-actions">
+          <button onClick={handleSubmit} className="create-button">Create</button>
+          <button onClick={onClose} className="cancel-button">Cancel</button>
         </div>
       </div>
     </div>
   );
 };
 
-const unitDashboard: React.FC = () => {
+const UnitDashboard: React.FC = () => {
   const unitName = "CS101"; // Example unit name
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
@@ -86,17 +87,17 @@ const unitDashboard: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="container">
       <h1>{unitName} Dashboard</h1>
 
       {/* Button to open the modal for creating a new project */}
-      <button onClick={() => setModalOpen(true)} style={styles.createButton}>
+      <button onClick={() => setModalOpen(true)} className="create-button">
         Create Project
       </button>
-      <button onClick={() => setUploadModalOpen(true)} style={styles.uploadButton}>
+      <button onClick={() => setUploadModalOpen(true)} className="upload-button">
         Upload CSV
       </button>
-      {error && <p style={styles.error}>{error}</p>}
+      {error && <p className="error">{error}</p>}
 
       {/* Modal for project creation */}
       <Modal 
@@ -113,15 +114,15 @@ const unitDashboard: React.FC = () => {
       />
 
       {/* Flex container to hold both Assignments and Tutors */}
-      <div style={styles.content}>
+      <div className="content">
         {/* Section for displaying assignments */}
-        <div style={styles.assignments}>
+        <div className="assignments">
           <h2>Assignments</h2>
           <Assignments /> {/* Call the Assignments component */}
         </div>
 
         {/* Section for displaying tutors */}
-        <div style={styles.tutors}>
+        <div className="tutors">
           <h2>Tutors</h2>
           <Tutors /> {/* Call the Tutors component */}
         </div>
@@ -130,89 +131,4 @@ const unitDashboard: React.FC = () => {
   );
 };
 
-// Simple inline styles for layout
-const styles = {
-  container: {
-    padding: '20px',
-  },
-  modalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-    width: '400px',
-  },
-  input: {
-    padding: '10px',
-    marginBottom: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    width: '100%', // Full width input
-  },
-  modalActions: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  createButton: {
-    padding: '10px 15px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginRight: '10px', // Add some space between buttons
-  },
-  uploadButton: {
-    padding: '10px 15px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  cancelButton: {
-    padding: '10px 15px',
-    backgroundColor: '#dc3545',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  error: {
-    color: 'red',
-    marginTop: '10px',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'row', // Ensures elements are placed side by side
-    gap: '20px',
-  },
-  assignments: {
-    flex: 4, // Takes 4/5 of the width
-    padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    backgroundColor: '#f9f9f9',
-  },
-  tutors: {
-    flex: 1, // Takes 1/5 of the width
-    padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    backgroundColor: '#f9f9f9',
-  },
-};
-
-export default unitDashboard;
+export default UnitDashboard;

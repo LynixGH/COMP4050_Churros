@@ -1,0 +1,42 @@
+/* UserDashboard.css */
+
+/* Container */
+.unit-dashboard {
+    padding: 20px;
+  }
+  
+  /* Sections for Active and Inactive Units */
+  .units-section {
+    display: flex; /* Use flexbox for layout */
+    flex-wrap: wrap; /* Allow cards to wrap to the next line */
+    gap: 20px; /* Space between unit cards */
+    margin-bottom: 40px; /* Space below each section */
+  }
+  
+  /* Active Units Styling */
+  .active-units {
+    background-color: #e9f7ef; /* Light green background for active units */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #c3e6cb; /* Border color for active units */
+  }
+  
+  /* Inactive Units Styling */
+  .inactive-units {
+    background-color: #f8d7da; /* Light red background for inactive units */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb; /* Border color for inactive units */
+  }
+  
+  /* Unit Card Styling */
+  .unit-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px; /* Fixed width for each card */
+    background-color: #f9f9f9;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+  

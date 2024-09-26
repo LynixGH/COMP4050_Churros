@@ -1,0 +1,20 @@
+/* UnitCard.css */
+/* Individual Unit Card Styling */
+.unit-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 250px; /* Fixed width for cards */
+  background-color: #f9f9f9;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+/* Unit Card Header */
+.unit-card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+/* Unit Card Paragraphs */
+.unit-card p {
+  margin: 5px 0;
+}

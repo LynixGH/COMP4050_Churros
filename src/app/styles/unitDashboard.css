@@ -1,0 +1,120 @@
+/* UserDashboard.css */
+
+/* Container */
+.unit-dashboard {
+    padding: 20px;
+}
+
+/* Sections for Active and Inactive Units */
+.units-section {
+    display: flex; /* Use flexbox for layout */
+    flex-wrap: wrap; /* Allow cards to wrap to the next line */
+    gap: 20px; /* Space between unit cards */
+    margin-bottom: 40px; /* Space below each section */
+}
+
+/* Individual Unit Card Styling */
+.active-units {
+    background-color: #e9f7ef; /* Light green background for active units */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #c3e6cb; /* Border color for active units */
+}
+
+.inactive-units {
+    background-color: #f8d7da; /* Light red background for inactive units */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb; /* Border color for inactive units */
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+}
+
+/* Input */
+.input {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Full width input */
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Buttons */
+.create-button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Add some space between buttons */
+}
+
+.upload-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Error Message */
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Assignments Section */
+.assignments {
+    flex: 3; /* Adjusted to take 3/4 of the width */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Tutors Section */
+.tutors {
+    flex: 1; /* Takes 1/4 of the width */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
