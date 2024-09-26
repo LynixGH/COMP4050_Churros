@@ -1,26 +1,27 @@
+// AssignmentDashboard.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
 
 const AssignmentDashboard: React.FC = () => {
-  const [unitName, setUnitName] = useState<string>('CS101'); // Example unit name
-  const [assignmentName, setAssignmentName] = useState<string>('Fastest Scheduling Algorithm'); // Example assignment name
-  const [submissions, setSubmissions] = useState<any[]>([]); // State to hold submissions
+  const [unitName, setUnitName] = useState<string>('CS101');
+  const [assignmentName, setAssignmentName] = useState<string>('Fastest Scheduling Algorithm');
+  const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]); // Track selected submission IDs
+  const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
+  const [showTemplate, setShowTemplate] = useState<boolean>(false); // State to manage overlay visibility
 
   useEffect(() => {
-    // Fetch submissions when component mounts
     fetchSubmissions();
   }, []);
 
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get('http://54.206.102.192/units/CS101/projects/FastestSchedulingAlgorithm/files');
-      // Access the submission_files from the response data
       setSubmissions(response.data.submission_files);
     } catch (err) {
       console.error("Error fetching submissions", err);
@@ -31,13 +32,13 @@ const AssignmentDashboard: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
-      setError(null); // Reset error on file selection
+      setError(null);
     }
   };
 
   const handleUpload = async () => {
     if (selectedFile) {
-      setLoading(true); // Start loading state
+      setLoading(true);
       const formData = new FormData();
       formData.append('file', selectedFile);
 
@@ -47,13 +48,13 @@ const AssignmentDashboard: React.FC = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
-        setSelectedFile(null); // Clear the file input after submission
-        fetchSubmissions(); // Refresh the submissions list after successful upload
+        setSelectedFile(null);
+        fetchSubmissions();
       } catch (err) {
         console.error("Error uploading file", err);
         setError("Failed to upload file.");
       } finally {
-        setLoading(false); // Stop loading state
+        setLoading(false);
       }
     }
   };
@@ -64,6 +65,22 @@ const AssignmentDashboard: React.FC = () => {
         ? prev.filter(id => id !== submissionId) 
         : [...prev, submissionId]
     );
+  };
+
+  const handleGenerateQuestions = async () => {
+    if (selectedSubmissions.length > 0) {
+      try {
+        const response = await axios.post('http://54.206.102.192/units/CS101/projects/FastestSchedulingAlgorithm/generate-questions', {
+          submission_ids: selectedSubmissions,
+        });
+        console.log("Questions generated successfully:", response.data);
+      } catch (err) {
+        console.error("Error generating questions", err);
+        setError("Failed to generate questions.");
+      }
+    } else {
+      setError("Please select at least one submission.");
+    }
   };
 
   return (
@@ -86,11 +103,28 @@ const AssignmentDashboard: React.FC = () => {
         </div>
       ) : null}
 
-      <h3 className="text-lg font-semibold mt-4">Submissions</h3>
+      <div className="flex justify-between items-center mt-4">
+        <h3 className="text-lg font-semibold">Submissions</h3>
+        <div>
+          <button 
+            onClick={() => setShowTemplate(true)} // Show the QuestionTemplate overlay
+            className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+          >
+            Add Question Template
+          </button>
+          <button
+            onClick={handleGenerateQuestions} 
+            className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
+          >
+            Generate Questions
+          </button>
+        </div>
+      </div>
+
       {submissions.length === 0 ? (
         <p>No submissions uploaded yet.</p>
       ) : (
-        <div className="overflow-x-auto pr-10"> {/* Added right padding here */}
+        <div className="overflow-x-auto pr-10">
           <table className="min-w-full mt-2 border border-gray-300 rounded-lg">
             <thead>
               <tr className="bg-gray-100">
@@ -131,6 +165,8 @@ const AssignmentDashboard: React.FC = () => {
           </table>
         </div>
       )}
+
+      {showTemplate && <QuestionTemplate onClose={() => setShowTemplate(false)} />} {/* Render the overlay */}
     </div>
   );
 };
