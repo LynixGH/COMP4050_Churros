@@ -1,9 +1,10 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import Assignments from '@/app/components/Assignment'; // Import the Assignments component
 import Tutors from '@/app/components/TutorList'; // Import the Tutors component
 import axios from 'axios';
+import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
 
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
@@ -41,6 +42,7 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
 const UnitDashboard: React.FC = () => {
   const unitName = "CS101"; // Example unit name
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
+  const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
   const [error, setError] = useState<string | null>(null); // State for error messages
 
   const handleCreateProject = (newProjectName: string) => {
@@ -62,6 +64,27 @@ const UnitDashboard: React.FC = () => {
       });
   };
 
+  const handleFileUpload = (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Make a POST request to upload the CSV file
+    axios.post('http://54.206.102.192/units/CS101/students', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(response => {
+      console.log("File uploaded successfully:", response.data);
+      setUploadModalOpen(false); // Close the upload modal
+      window.location.reload(); // Refresh the page
+    })
+    .catch(err => {
+      console.error("Error uploading file", err);
+      setError("Failed to upload file.");
+    });
+  };
+
   return (
     <div style={styles.container}>
       <h1>{unitName} Dashboard</h1>
@@ -70,6 +93,9 @@ const UnitDashboard: React.FC = () => {
       <button onClick={() => setModalOpen(true)} style={styles.createButton}>
         Create Project
       </button>
+      <button onClick={() => setUploadModalOpen(true)} style={styles.uploadButton}>
+        Upload CSV
+      </button>
       {error && <p style={styles.error}>{error}</p>}
 
       {/* Modal for project creation */}
@@ -77,6 +103,13 @@ const UnitDashboard: React.FC = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleCreateProject}
+      />
+
+      {/* Modal for file upload */}
+      <UploadModal 
+        isOpen={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onUpload={handleFileUpload}
       />
 
       {/* Flex container to hold both Assignments and Tutors */}
@@ -135,6 +168,15 @@ const styles = {
   createButton: {
     padding: '10px 15px',
     backgroundColor: '#28a745',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginRight: '10px', // Add some space between buttons
+  },
+  uploadButton: {
+    padding: '10px 15px',
+    backgroundColor: '#007bff',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
