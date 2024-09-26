@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface Assignment {
-  project_id: number;
+  project_id?: number;
   project_name: string;
-  unit_code: string;
+  unit_code?: string;
 }
 
-const Assignments: React.FC = () => {
+const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, project_name="ERROR"}) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,10 +17,19 @@ const Assignments: React.FC = () => {
 
   useEffect(() => {
     // Fetch assignments from the API
-    axios.get('http://54.206.102.192/units/CS101/projects')
+    console.log('Did something rather than nothing');
+    axios.get(`http://54.206.102.192/units/${unit_code}/projects`) // Changed this by adding ` instead of '.
       .then(response => {
-        setAssignments(response.data);
-        setLoading(false);
+        console.log(response);
+        if (response.status === 200 && response.data) {
+          setAssignments(response.data);
+          setLoading(false);
+        } else {
+          // If the response status is not 200 or data is not present, redirect
+          setError('Unit not found');
+          setLoading(false);
+          window.location.href = '/'; // Redirect to homepage
+        }
       })
       .catch(err => {
         console.error("Error fetching assignments", err);
@@ -42,7 +51,8 @@ const Assignments: React.FC = () => {
 
   const handleDeleteClick = (assignment: Assignment) => {
     // Make DELETE request to remove the assignment
-    axios.delete(`http://54.206.102.192/units/CS101/projects/${encodeURIComponent(assignment.project_name)}`)
+    console.log(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`);
+    axios.delete(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`)
       .then(response => {
         // Remove the deleted assignment from the state
         setAssignments(prevAssignments => 
@@ -65,7 +75,7 @@ const Assignments: React.FC = () => {
       };
 
       // Make PUT request to update the assignment name
-      axios.put(`http://54.206.102.192/units/CS101/projects/${encodeURIComponent(selectedAssignment.project_name)}`, updatedAssignment)
+      axios.put(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(selectedAssignment.project_name)}`, updatedAssignment)
         .then(response => {
           // Update the state with the new assignment name
           setAssignments(prevAssignments => 

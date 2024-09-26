@@ -14,8 +14,6 @@ interface Unit {
 // Define the constant for the API URL
 const API_URL = 'http://54.206.102.192/units';
 
-
-
 const UserDashboard = () => {
   const [units, setUnits] = useState<Unit[]>([]);
   const convenerEmail = 'convener2@example.com'; // Replace with dynamic email if needed

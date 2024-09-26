@@ -57,9 +57,9 @@ const Menu = () => {
         <div className=''>
             {menuItems.map((i) => (
                 <div className='flex flex-col gap-2' key={i.title}>
-                    <span className="hidden lg:block text-gray-200 font-light mg-4">{i.title}</span>
+                    <span className="hidden lg:block text-gray-700 font-light mg-4">{i.title}</span>
                     {i.items.map((item) => (
-                        <Link href={item.href} key={item.label} className="flex items-center justify-center lg:justify-start gap-4 text-gray-100 py-2">
+                        <Link href={item.href} key={item.label} className="flex items-center justify-center lg:justify-start gap-4 text-gray-700 py-2">
                             <Image src={item.icon} alt="" width={20} height={20}/>
                             <span className="hidden lg:block">{item.label}</span>
                         </Link>

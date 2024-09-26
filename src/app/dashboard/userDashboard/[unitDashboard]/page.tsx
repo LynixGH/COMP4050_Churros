@@ -41,11 +41,32 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
   );
 };
 
-const UnitDashboard: React.FC = () => {
-  const unitName = "CS101"; // Example unit name
+// const UnitDashboard: React.FC = () => {
+
+export default function UnitDashboard ({ params }: { params: { unitDashboard: string } }){
+  
+  // const unitName = "CS101"; // Example unit name
+  const unitName = params.unitDashboard;
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
   const [error, setError] = useState<string | null>(null); // State for error messages
+
+  // console.log(params);
+  // console.log(unitName)
+  axios.get(`http://54.206.102.192/units/${unitName}`) // Changed this by adding ` instead of '.
+      .then(response => {
+        //console.log(response);
+        if (response.status === 404) {
+          //
+          console.log('Failed to load');
+        } 
+      })
+      .catch(err => {
+        console.error("Error fetching unit", err);
+        setError('Failed to load unit');
+        window.location.href = '/dashboard/userDashboard';
+      });
+  
 
   const handleCreateProject = (newProjectName: string) => {
     const projectData = {
@@ -53,7 +74,7 @@ const UnitDashboard: React.FC = () => {
     };
 
     // Make a POST request to create a new project
-    axios.post('http://54.206.102.192/units/CS101/projects', projectData)
+    axios.post(`http://54.206.102.192/units/${unitName}/projects`, projectData)
       .then(response => {
         console.log("Project created successfully:", response.data);
         setModalOpen(false); // Close the modal
@@ -71,7 +92,7 @@ const UnitDashboard: React.FC = () => {
     formData.append('file', file);
 
     // Make a POST request to upload the CSV file
-    axios.post('http://54.206.102.192/units/CS101/students', formData, {
+    axios.post(`http://54.206.102.192/units/${unitName}/students`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -87,6 +108,7 @@ const UnitDashboard: React.FC = () => {
     });
   };
 
+  
   return (
     <div className="container">
       <h1>{unitName} Dashboard</h1>
@@ -119,7 +141,7 @@ const UnitDashboard: React.FC = () => {
         {/* Section for displaying assignments */}
         <div className="assignments">
           <h2>Assignments</h2>
-          <Assignments /> {/* Call the Assignments component */}
+          <Assignments project_name='fuckit' unit_code={unitName}/> {/* Call the Assignments component */}
         </div>
 
         {/* Section for displaying tutors */}
@@ -132,4 +154,4 @@ const UnitDashboard: React.FC = () => {
   );
 };
 
-export default UnitDashboard;
+// export default UnitDashboard;
