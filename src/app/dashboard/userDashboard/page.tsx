@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import UnitCard from '@/app/components/UnitCard'; // Import the UnitCard component
 import '@/app/styles/UserDashboard.css'; // Import the dashboard styles
+import CreateUnitPopup from '@/app/components/CreateUnitPopup';
 
 interface Unit {
   unit_code: string;
@@ -17,6 +18,15 @@ const API_URL = 'http://54.206.102.192/units';
 const UserDashboard = () => {
   const [units, setUnits] = useState<Unit[]>([]);
   const convenerEmail = 'convener2@example.com'; // Replace with dynamic email if needed
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
 
   // Get current year and session based on the current date
   const currentDate = new Date();
@@ -96,6 +106,9 @@ const UserDashboard = () => {
 
   return (
     <div className="unit-dashboard">
+            <button onClick={handleOpenPopup}>Create New Unit</button>
+
+{isPopupOpen && <CreateUnitPopup onClose={handleClosePopup} />}
       <h2>Active Units</h2>
       <div className="units-section active-units">
         {activeUnits.length > 0 ? (
