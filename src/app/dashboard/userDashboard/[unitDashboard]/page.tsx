@@ -7,7 +7,6 @@ import axios from 'axios';
 import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
 import '@/app/styles/unitDashboard.css'; // Import the CSS file
 
-
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
   const [projectName, setProjectName] = useState<string>('');
@@ -41,39 +40,29 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
   );
 };
 
-// const UnitDashboard: React.FC = () => {
-
-export default function UnitDashboard ({ params }: { params: { unitDashboard: string } }){
-  
-  // const unitName = "CS101"; // Example unit name
+export default function UnitDashboard({ params }: { params: { unitDashboard: string } }) {
   const unitName = params.unitDashboard;
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
   const [error, setError] = useState<string | null>(null); // State for error messages
 
-  // console.log(params);
-  // console.log(unitName)
-  axios.get(`http://54.206.102.192/units/${unitName}`) // Changed this by adding ` instead of '.
-      .then(response => {
-        //console.log(response);
-        if (response.status === 404) {
-          //
-          console.log('Failed to load');
-        } 
-      })
-      .catch(err => {
-        console.error("Error fetching unit", err);
-        setError('Failed to load unit');
-        window.location.href = '/dashboard/userDashboard';
-      });
-  
+  axios.get(`http://54.206.102.192/units/${unitName}`)
+    .then(response => {
+      if (response.status === 404) {
+        console.log('Failed to load');
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching unit", err);
+      setError('Failed to load unit');
+      window.location.href = '/dashboard/userDashboard';
+    });
 
   const handleCreateProject = (newProjectName: string) => {
     const projectData = {
       project_name: newProjectName
     };
 
-    // Make a POST request to create a new project
     axios.post(`http://54.206.102.192/units/${unitName}/projects`, projectData)
       .then(response => {
         console.log("Project created successfully:", response.data);
@@ -91,24 +80,22 @@ export default function UnitDashboard ({ params }: { params: { unitDashboard: st
     const formData = new FormData();
     formData.append('file', file);
 
-    // Make a POST request to upload the CSV file
     axios.post(`http://54.206.102.192/units/${unitName}/students`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-    .then(response => {
-      console.log("File uploaded successfully:", response.data);
-      setUploadModalOpen(false); // Close the upload modal
-      window.location.reload(); // Refresh the page
-    })
-    .catch(err => {
-      console.error("Error uploading file", err);
-      setError("Failed to upload file.");
-    });
+      .then(response => {
+        console.log("File uploaded successfully:", response.data);
+        setUploadModalOpen(false); // Close the upload modal
+        window.location.reload(); // Refresh the page
+      })
+      .catch(err => {
+        console.error("Error uploading file", err);
+        setError("Failed to upload file.");
+      });
   };
 
-  
   return (
     <div className="container">
       <h1>{unitName} Dashboard</h1>
@@ -141,7 +128,7 @@ export default function UnitDashboard ({ params }: { params: { unitDashboard: st
         {/* Section for displaying assignments */}
         <div className="assignments">
           <h2>Assignments</h2>
-          <Assignments project_name='fuckit' unit_code={unitName}/> {/* Call the Assignments component */}
+          <Assignments project_name='AssignmentName' unit_code={unitName}/> {/* Call the Assignments component */}
         </div>
 
         {/* Section for displaying tutors */}
@@ -153,5 +140,3 @@ export default function UnitDashboard ({ params }: { params: { unitDashboard: st
     </div>
   );
 };
-
-// export default UnitDashboard;

@@ -1,4 +1,4 @@
-/* UserDashboard.css */
+/* UnitDashboard.css */
 
 /* Container */
 .unit-dashboard {
@@ -101,20 +101,40 @@
     margin-top: 10px;
 }
 
+/* Content Section for Assignments and Tutors */
+.content {
+    display: flex; /* Use flexbox for layout */
+    gap: 20px; /* Space between assignments and tutors sections */
+    margin-top: 20px; /* Space above the content section */
+}
+
 /* Assignments Section */
 .assignments {
-    flex: 3; /* Adjusted to take 3/4 of the width */
-    padding: 10px;
+    flex: 3; /* Takes 3/4 of the width */
+    padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for better visibility */
 }
 
 /* Tutors Section */
 .tutors {
     flex: 1; /* Takes 1/4 of the width */
-    padding: 10px;
+    padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for better visibility */
+}
+
+/* Responsive Design: Adjust the layout for smaller screens */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column; /* Stack the assignments and tutors vertically */
+    }
+
+    .assignments, .tutors {
+        flex: 1; /* Full width for both sections */
+    }
 }
