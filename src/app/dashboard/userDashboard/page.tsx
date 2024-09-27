@@ -80,9 +80,19 @@ const UserDashboard = () => {
   const activeUnits = units.filter(
     (unit) => unit.year === currentYear && unit.session === currentSession
   );
-  const inactiveUnits = units.filter(
-    (unit) => !(unit.year === currentYear && unit.session === currentSession)
-  );
+
+  // Sort inactive units based on year and session
+  const inactiveUnits = units
+    .filter(
+      (unit) => !(unit.year === currentYear && unit.session === currentSession)
+    )
+    .sort((a, b) => {
+      if (a.year !== b.year) {
+        return parseInt(b.year) - parseInt(a.year); // Sort by year descending
+      } else {
+        return a.session === 'S2' && b.session === 'S1' ? -1 : 1; // Sort by session, S2 first
+      }
+    });
 
   return (
     <div className="unit-dashboard">
