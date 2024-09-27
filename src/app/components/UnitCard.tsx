@@ -1,5 +1,7 @@
 import React from 'react';
-import '@/app/styles/UnitCard.css'; // Import the UnitCard styles
+import Link from 'next/link'; // Import Link from Next.js for routing
+import '@/app/styles/UnitCard.css';
+
 interface UnitProps {
   unit: {
     unit_code: string;
@@ -8,15 +10,17 @@ interface UnitProps {
     session: string;
   };
 }
+
 const UnitCard: React.FC<UnitProps> = ({ unit }) => {
   return (
-    <div className="unit-card">
-      <h3>{unit.unit_code}</h3>
-      <p>{unit.unit_name}</p>
-      <p>
-        {unit.year} - {unit.session}
-      </p>
-    </div>
+    <Link href={`/dashboard/userDashboard/${unit.unit_code}`} passHref>
+      <div className="unit-card">
+        <h3>{unit.unit_code}</h3>
+        <p>{unit.unit_name}</p>
+        <p>{unit.year} - {unit.session}</p>
+      </div>
+    </Link>
   );
 };
+
 export default UnitCard;
