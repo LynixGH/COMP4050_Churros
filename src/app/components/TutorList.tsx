@@ -82,7 +82,7 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
       <div style={styles.header}>
         <h2>Tutors / Collaborators</h2>
         <button onClick={toggleEditMode} style={styles.manageButton}>
-          {isEditing ? 'Cancel' : 'Manage Tutors'}
+          {isEditing ? 'Cancel' : 'Manage'}
         </button>
       </div>
 

@@ -133,8 +133,8 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
 
         {/* Section for displaying tutors */}
         <div className="tutors">
-          <h2>Tutors</h2>
-          <Tutors /> {/* Call the Tutors component */}
+          {/* <h2>Tutors</h2> */}
+          <Tutors unitCode={unitName}/> {/* Call the Tutors component */}
         </div>
       </div>
     </div>
