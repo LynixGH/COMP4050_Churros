@@ -1,8 +1,13 @@
-# Lama Dev School Management Dashboard
+# COMP4050 VivaMQ Churros Frontend
 
 ## Getting Started
 
-First, run the development server:
+First, setup the node modules:
+```bash
+npm install next@latest react@latest react-dom@latest
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
