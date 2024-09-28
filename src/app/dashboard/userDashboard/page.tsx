@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import UnitCard from '@/app/components/UnitCard'; // Import the UnitCard component
-import '@/app/styles/UserDashboard.css'; // Import the dashboard styles
+import '@/app/styles/userDashboard.css'; // Import the dashboard styles
 import CreateUnitPopup from '@/app/components/CreateUnitPopup';
 
 interface Unit {
