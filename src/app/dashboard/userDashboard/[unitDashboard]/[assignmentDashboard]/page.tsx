@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
 
-const assignmentDashboard: React.FC = () => {
+const AssignmentDashboard: React.FC = () => {
   const [unitName, setUnitName] = useState<string>('CS101');
   const [assignmentName, setAssignmentName] = useState<string>('Fastest Scheduling Algorithm');
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -185,4 +185,4 @@ const assignmentDashboard: React.FC = () => {
   );
 };
 
-export default assignmentDashboard;
+export default AssignmentDashboard;
