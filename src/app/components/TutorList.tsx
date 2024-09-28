@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
 
 interface Tutor {
@@ -128,7 +128,7 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
 };
 
 // Inline styles for layout
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
   container: {
     padding: '16px',
   },
