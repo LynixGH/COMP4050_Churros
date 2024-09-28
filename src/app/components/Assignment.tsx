@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
 
 interface Assignment {
@@ -16,19 +16,17 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
   const [newName, setNewName] = useState<string>('');
 
   useEffect(() => {
-    // Fetch assignments from the API
     console.log('Did something rather than nothing');
-    axios.get(`http://54.206.102.192/units/${unit_code}/projects`) // Changed this by adding ` instead of '.
+    axios.get(`http://54.206.102.192/units/${unit_code}/projects`)
       .then(response => {
         console.log(response);
         if (response.status === 200 && response.data) {
           setAssignments(response.data);
           setLoading(false);
         } else {
-          // If the response status is not 200 or data is not present, redirect
           setError('Unit not found');
           setLoading(false);
-          window.location.href = '/'; // Redirect to homepage
+          window.location.href = '/';
         }
       })
       .catch(err => {
@@ -36,12 +34,12 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
         setError('Failed to load assignments');
         setLoading(false);
       });
-  }, []);
+  }, [unit_code]);
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode);
-    setSelectedAssignment(null); // Reset selected assignment when toggling edit mode
-    setNewName(''); // Clear the new name input
+    setSelectedAssignment(null);
+    setNewName('');
   };
 
   const handleEditClick = (assignment: Assignment) => {
@@ -50,11 +48,9 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
   };
 
   const handleDeleteClick = (assignment: Assignment) => {
-    // Make DELETE request to remove the assignment
     console.log(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`);
     axios.delete(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`)
       .then(response => {
-        // Remove the deleted assignment from the state
         setAssignments(prevAssignments => 
           prevAssignments.filter(a => a.project_id !== assignment.project_id)
         );
@@ -74,10 +70,8 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
         project_name: newName
       };
 
-      // Make PUT request to update the assignment name
       axios.put(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(selectedAssignment.project_name)}`, updatedAssignment)
         .then(response => {
-          // Update the state with the new assignment name
           setAssignments(prevAssignments => 
             prevAssignments.map(assignment => 
               assignment.project_id === selectedAssignment.project_id 
@@ -85,7 +79,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
                 : assignment
             )
           );
-          setSelectedAssignment(null); // Close the modal
+          setSelectedAssignment(null);
         })
         .catch(err => {
           console.error("Error updating assignment", err);
@@ -123,7 +117,6 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
         </div>
       ))}
 
-      {/* Move the Edit button to the bottom of the section */}
       {isEditMode ? (
         <button onClick={toggleEditMode} style={styles.cancelButton}>
           Cancel Editing
@@ -134,7 +127,6 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
         </button>
       )}
 
-      {/* Edit Modal */}
       {selectedAssignment && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
@@ -157,7 +149,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
 };
 
 // Inline styles for the component
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -176,7 +168,7 @@ const styles = {
     alignItems: 'center',
   },
   assignmentInfo: {
-    flex: 1, // Allow the assignment info to take available space
+    flex: 1,
   },
   editButton: {
     marginTop: '10px',
@@ -189,20 +181,19 @@ const styles = {
   },
   actions: {
     display: 'flex',
-    justifyContent: 'flex-end', // Align buttons to the far right
-    gap: '10px', // Space between buttons
+    justifyContent: 'flex-end',
+    gap: '10px',
   },
   actionButton: {
     padding: '8px 12px',
-    backgroundColor: '#dc3545', // Red for delete button
+    backgroundColor: '#dc3545',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
   },
-  // Modal styles
   modalOverlay: {
-    position: 'fixed' as 'fixed',
+    position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
