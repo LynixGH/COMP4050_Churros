@@ -1,33 +1,36 @@
-/* Button Styles */
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .edit-btn {
-    background-color: #28a745; /* Green for edit */
-    margin-right: 10px;
-  }
-  
-  .edit-btn:hover {
-    background-color: #218838;
-  }
-  
-  .delete-btn {
-    background-color: #dc3545; /* Red for delete */
-  }
-  
-  .delete-btn:hover {
-    background-color: #c82333;
-  }
-  
+.rubric-table-container {
+  margin-top: 20px;
+  width: 100%;
+  overflow-x: auto; /* Handle long tables on small screens */
+}
+
+.rubric-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.rubric-table th, .rubric-table td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.rubric-table th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+}
+
+.rubric-table td ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rubric-table td ul li {
+  margin-bottom: 10px;
+}
+
+.rubric-table tbody tr:hover {
+  background-color: #f9f9f9;
+}

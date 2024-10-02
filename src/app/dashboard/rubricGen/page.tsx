@@ -1,154 +1,258 @@
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
-import '@/app/styles/rubricGen.css'; // Import your styles
-import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // Import the CreateRubricPopup component
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import '@/app/styles/rubricGen.css';
+import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
+import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
 
 const RubricGen = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [rubricData, setRubricData] = useState(null); // State to hold fetched rubric data
+  const [allRubrics, setAllRubrics] = useState([]); // State to hold all rubrics
   const [editRubric, setEditRubric] = useState(null); // State for holding rubric to be edited
-  const API_URL = 'http://54.206.102.192/rubrics'; // Update with correct endpoint
 
-  const handleOpenPopup = () => {
-    setIsPopupOpen(true);
+  const handleOpenCreatePopup = () => {
+    setIsCreatePopupOpen(true);
   };
 
-  const handleClosePopup = (updatedRubric) => {
-    if (updatedRubric) {
-      setRubricData(updatedRubric); // Update the rubric with the new or edited data
+  const handleOpenEditPopup = (rubric) => {
+    setEditRubric(rubric);
+    setIsEditPopupOpen(true);
+  };
+
+  const handleCloseCreatePopup = (newRubric) => {
+    if (newRubric) {
+      setAllRubrics((prevRubrics) => [...prevRubrics, newRubric]); // Add new rubric to the list
     }
-    setIsPopupOpen(false);
-    setEditRubric(null); // Reset editing state
+    setIsCreatePopupOpen(false);
+  };
+
+  const handleCloseEditPopup = (updatedRubric) => {
+    if (updatedRubric) {
+      setAllRubrics((prevRubrics) =>
+        prevRubrics.map((rubric) =>
+          rubric.rubric_title === updatedRubric.rubric_title ? updatedRubric : rubric
+        )
+      ); // Update the edited rubric
+    }
+    setIsEditPopupOpen(false);
+  };
+
+  // Delete a rubric
+  const handleDeleteRubric = (rubricTitle) => {
+    setAllRubrics((prevRubrics) =>
+      prevRubrics.filter((rubric) => rubric.rubric_title !== rubricTitle)
+    );
   };
 
   useEffect(() => {
-    // Simulate a GET request to fetch rubric data
-    const fetchRubric = async () => {
-      try {
-        const response = await axios.get(API_URL);
-        setRubricData(response.data); // Set the fetched data
-      } catch (error) {
-        console.error('Error fetching rubric data:', error);
-
-        // Simulate rubric data as a fallback since the API is down
-        const sampleRubric = {
-          staff_email: 'john.doe@example.com',
-          assessment_description:
-            'This assessment tests knowledge of process management, memory management, and file systems in operating systems.',
-          criteria: [
-            {
-              criterion: 'Process Management',
-              keywords: ['processes', 'scheduling', 'multithreading'],
-              competencies: ['understanding of process lifecycle'],
-              skills: ['solve synchronization issues'],
-              knowledge: ['scheduling algorithms', 'process synchronization'],
-            },
-            {
-              criterion: 'Memory Management',
-              keywords: ['virtual memory', 'paging', 'segmentation'],
-              competencies: ['memory allocation strategies'],
-              skills: ['apply virtual memory concepts'],
-              knowledge: ['paging', 'memory allocation'],
-            },
-            {
-              criterion: 'File Systems',
-              keywords: ['file system architecture', 'file allocation'],
-              competencies: ['file system design'],
-              skills: ['optimize file systems'],
-              knowledge: ['file allocation methods', 'disk scheduling'],
-            },
-          ],
-          ulos: [
-            'ULO1: Understand core OS concepts like process, memory, and file systems.',
-            'ULO2: Apply OS algorithms to solve problems.',
-            'ULO3: Critically evaluate OS architectures.',
-            'ULO4: Solve OS concurrency and synchronization problems.',
-          ],
-        };
-
-        // Set the sample rubric data
-        setRubricData(sampleRubric);
-      }
+    // Sample data
+    const sampleRubric = {
+      rubric_title: "COMP3250 Computer Networks Assignment 1",
+      ulo_list: [
+        {
+          ulo_item: "Demonstrate an understanding of advanced knowledge in networking (especially in Internet technologies) and be able to communicate this knowledge to wider audience",
+        },
+        {
+          ulo_item: "Design TCP/IP based networks and protocols and to integrate such networks with other networking technologies",
+        },
+        {
+          ulo_item: "Have a working knowledge of practical advanced networking and write professional documentation",
+        },
+        {
+          ulo_item: "Demonstrate an understanding of security issues in computer networking.",
+        },
+        {
+          ulo_item: "Engage in independent professional work with a high level of autonomy and accountability.",
+        },
+      ],
+      grade_descriptor_list: [
+        {
+          grade_descriptor_item: {
+            grade_descriptor_name: "Fail",
+            mark_min: 0,
+            mark_max: 49,
+            criterion_list: [
+              {
+                criteria_name: "Correctness",
+                criteria_description: "Significant inaccuracies, little understanding of key concepts, incorrect solutions.",
+              },
+              {
+                criteria_name: "Critical Thinking (Explanation/Analysis)",
+                criteria_description: "Limited analysis of scenarios, relies on surface-level thinking.",
+              },
+              {
+                criteria_name: "Communication and Presentation",
+                criteria_description: "Frequent grammatical errors, lack of clarity in explanations, does not adhere to the word limit.",
+              },
+              {
+                criteria_name: "Referencing",
+                criteria_description: "Poor or no use of referencing style, lacks in-text citations, reference list missing.",
+              },
+            ],
+          },
+        },
+        {
+          grade_descriptor_item: {
+            grade_descriptor_name: "Pass",
+            mark_min: 50,
+            mark_max: 64,
+            criterion_list: [
+              {
+                criteria_name: "Correctness",
+                criteria_description: "Addresses most aspects of the questions accurately with some understanding of key concepts.",
+              },
+              {
+                criteria_name: "Critical Thinking (Explanation/Analysis)",
+                criteria_description: "Basic analysis provided, some depth of understanding shown.",
+              },
+              {
+                criteria_name: "Communication and Presentation",
+                criteria_description: "Minor grammatical errors, generally clear explanations, adheres to the word limit.",
+              },
+              {
+                criteria_name: "Referencing",
+                criteria_description: "Basic application of referencing style, some in-text citations, reference list present but may have errors.",
+              },
+            ],
+          },
+        },
+        {
+          grade_descriptor_item: {
+            grade_descriptor_name: "Credit",
+            mark_min: 65,
+            mark_max: 74,
+            criterion_list: [
+              {
+                criteria_name: "Correctness",
+                criteria_description: "Accurately addresses all aspects of questions, demonstrates understanding of key concepts.",
+              },
+              {
+                criteria_name: "Critical Thinking (Explanation/Analysis)",
+                criteria_description: "Good analysis of scenarios, demonstrates some insight into subject matter.",
+              },
+              {
+                criteria_name: "Communication and Presentation",
+                criteria_description: "Clear explanations, few grammatical errors, adheres to word limit.",
+              },
+              {
+                criteria_name: "Referencing",
+                criteria_description: "Correct application of referencing style, appropriate in-text citations, accurate reference list.",
+              },
+            ],
+          },
+        },
+        {
+          grade_descriptor_item: {
+            grade_descriptor_name: "Distinction",
+            mark_min: 75,
+            mark_max: 84,
+            criterion_list: [
+              {
+                criteria_name: "Correctness",
+                criteria_description: "Comprehensively addresses all aspects of questions, demonstrates thorough understanding of concepts.",
+              },
+              {
+                criteria_name: "Critical Thinking (Explanation/Analysis)",
+                criteria_description: "Insightful analysis and evaluation of scenarios, shows depth of understanding.",
+              },
+              {
+                criteria_name: "Communication and Presentation",
+                criteria_description: "Well-organized explanations, minimal grammatical errors, adheres to word limit.",
+              },
+              {
+                criteria_name: "Referencing",
+                criteria_description: "Detailed application of referencing style, precise in-text citations, comprehensive reference list.",
+              },
+            ],
+          },
+        },
+        {
+          grade_descriptor_item: {
+            grade_descriptor_name: "High Distinction",
+            mark_min: 85,
+            mark_max: 100,
+            criterion_list: [
+              {
+                criteria_name: "Correctness",
+                criteria_description: "Thorough and accurate responses to all questions, demonstrates exceptional understanding of key concepts.",
+              },
+              {
+                criteria_name: "Critical Thinking (Explanation/Analysis)",
+                criteria_description: "Highly insightful analysis, shows exceptional depth of understanding and critical evaluation.",
+              },
+              {
+                criteria_name: "Communication and Presentation",
+                criteria_description: "Professional standard of writing, highly coherent explanations, strictly adheres to word limit.",
+              },
+              {
+                criteria_name: "Referencing",
+                criteria_description: "Exemplary application of referencing style, flawless in-text citations, fully and accurately compiled reference list.",
+              },
+            ],
+          },
+        },
+      ],
     };
 
-    fetchRubric();
+    // Set this sample rubric as initial data
+    setAllRubrics([sampleRubric]);
   }, []);
-
-  // Handle delete functionality
-  const handleDeleteRubric = () => {
-    setRubricData(null); // Remove the rubric from state
-  };
-
-  // Handle edit functionality
-  const handleEditRubric = () => {
-    setEditRubric(rubricData); // Set the current rubric data to edit
-    setIsPopupOpen(true); // Open popup with pre-filled data
-  };
 
   return (
     <div className="rubric-dashboard">
-      <button onClick={handleOpenPopup}>Create New Rubric</button>
+      <button onClick={handleOpenCreatePopup}>Create New Rubric</button>
 
-      {isPopupOpen && (
-        <CreateRubricPopup
-          onClose={handleClosePopup}
-          existingRubric={editRubric} // Pass the rubric to edit if in edit mode
-        />
+      {isCreatePopupOpen && <CreateRubricPopup onClose={handleCloseCreatePopup} />}
+
+      {isEditPopupOpen && editRubric && (
+        <EditRubricPopup onClose={handleCloseEditPopup} existingRubric={editRubric} />
       )}
 
-      <h2>Generated Rubrics</h2>
-      <div className="rubric-section">
-        {rubricData ? (
-          <div className="rubric-display">
-            <h3>Assessment Description</h3>
-            <p>{rubricData.assessment_description}</p>
+      {/* Render Rubric Data */}
+      {allRubrics.length > 0 ? (
+        allRubrics.map((rubric, index) => (
+          <div key={index} className="rubric-table-container">
+            <h2>{rubric.rubric_title}</h2>
 
-            <h3>Criteria</h3>
-            {rubricData.criteria && rubricData.criteria.length > 0 ? (
-              rubricData.criteria.map((criterion, index) => (
-                <div key={index} className="criterion-item">
-                  <h4>{criterion.criterion}</h4>
-                  <p>
-                    <strong>Keywords:</strong> {criterion.keywords.join(', ')}
-                  </p>
-                  <p>
-                    <strong>Competencies:</strong> {criterion.competencies.join(', ')}
-                  </p>
-                  <p>
-                    <strong>Skills:</strong> {criterion.skills.join(', ')}
-                  </p>
-                  <p>
-                    <strong>Knowledge:</strong> {criterion.knowledge.join(', ')}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p>No criteria available.</p>
-            )}
+            {/* Table to display the rubric */}
+            <table className="rubric-table">
+              <thead>
+                <tr>
+                  <th>Grade</th>
+                  <th>Mark Range</th>
+                  <th>Criteria</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rubric.grade_descriptor_list?.map((descriptor, idx) => (
+                  <tr key={idx}>
+                    <td>{descriptor.grade_descriptor_item.grade_descriptor_name}</td>
+                    <td>
+                      {descriptor.grade_descriptor_item.mark_min} - {descriptor.grade_descriptor_item.mark_max}
+                    </td>
+                    <td>
+                      <ul>
+                        {descriptor.grade_descriptor_item.criterion_list?.map((criterion, cIdx) => (
+                          <li key={cIdx}>
+                            <strong>{criterion.criteria_name}:</strong> {criterion.criteria_description}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-            <h3>Unit Learning Outcomes (ULOs)</h3>
-            <ul>
-              {rubricData.ulos && rubricData.ulos.length > 0 ? (
-                rubricData.ulos.map((ulo, index) => <li key={index}>{ulo}</li>)
-              ) : (
-                <p>No ULOs available.</p>
-              )}
-            </ul>
-
-            {/* Add Edit and Delete buttons */}
-            <button onClick={handleEditRubric} className="edit-btn">
-              Edit Rubric
-            </button>
-            <button onClick={handleDeleteRubric} className="delete-btn">
-              Delete Rubric
-            </button>
+            <button onClick={() => handleOpenEditPopup(rubric)}>Edit Rubric</button>
+            <button onClick={() => handleDeleteRubric(rubric.rubric_title)}>Delete Rubric</button>
           </div>
-        ) : (
-          <p>No rubrics available yet.</p>
-        )}
-      </div>
+        ))
+      ) : (
+        <p>No rubrics available</p>
+      )}
     </div>
   );
 };

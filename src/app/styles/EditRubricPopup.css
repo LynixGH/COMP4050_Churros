@@ -1,0 +1,135 @@
+/* Container for the popup */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: auto;
+  }
+  
+  /* The popup content box */
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  /* Textarea for ULOs with word wrapping */
+  textarea {
+    resize: vertical;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word; /* Ensure text wraps within the container */
+    word-wrap: break-word; /* Compatibility for older browsers */
+    white-space: pre-wrap; /* Ensure newlines are respected */
+    height: 100px; /* Set an initial height for readability */
+    margin-bottom: 15px;
+  }
+  
+  /* Dynamic list items (for ULOs, Criteria) */
+  .dynamic-list-item {
+    display: flex;
+    align-items: flex-start; /* Align items vertically */
+    margin-bottom: 20px;
+  }
+  
+  .dynamic-list-item textarea {
+    flex-grow: 1;
+    margin-right: 10px; /* Space between textarea and remove button */
+  }
+  
+  .dynamic-list-item button {
+    margin-left: 10px;
+    margin-top: 5px;
+    padding: 8px 12px;
+  }
+  
+  /* Add/Remove buttons styling */
+  .add-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .add-button:hover {
+    background-color: #218838;
+  }
+  
+  .remove-button {
+    background-color: #ff4c4c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  
+  .remove-button:hover {
+    background-color: #e63939;
+  }
+  
+  /* Styling for sections to maintain spacing */
+  .section-wrapper {
+    margin-bottom: 20px;
+  }
+  
+  .section-wrapper h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .section-wrapper h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .section-wrapper textarea {
+    margin-bottom: 15px;
+  }
+  
+  /* Improved responsiveness for smaller screens */
+  @media (max-width: 600px) {
+    .popup-content {
+      padding: 15px;
+      max-width: 100%;
+    }
+  
+    button, .add-button, .remove-button {
+      width: 100%; /* Full-width buttons for mobile */
+    }
+  }
+  

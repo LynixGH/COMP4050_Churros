@@ -1,88 +1,151 @@
 .popup-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px; /* Add some padding to the sides */
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: auto;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+input, textarea {
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Section Styling for better visual grouping */
+.criterion-section, .ulo-section {
+  margin-bottom: 25px;
+}
+
+.criterion-section h4, .ulo-section h4 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Add margin to keep sections from being too close to the remove button */
+.keyword-field, .competency-field, .skill-field, .knowledge-field {
+  display: flex;
+  flex-direction: column; /* Ensure items stack vertically */
+  margin-bottom: 15px; /* Spacing between the input fields and sections */
+}
+
+/* Inputs for sections like keywords, competencies, etc. */
+.keyword-field input, .competency-field input, .skill-field input, .knowledge-field input {
+  margin-bottom: 10px; /* Space between each input and next input/button */
+}
+
+/* Spacing between dynamic list items and their remove buttons */
+.dynamic-list-item {
+  display: flex;
+  align-items: flex-start; /* Align items to start vertically */
+  margin-bottom: 20px;
+}
+
+.dynamic-list-item input, .dynamic-list-item textarea {
+  flex-grow: 1;
+  margin-bottom: 0; /* Remove margin-bottom for inline inputs */
+}
+
+.dynamic-list-item button {
+  margin-left: 10px;
+  margin-top: 5px; /* Adds space between button and input */
+  padding: 8px 12px;
+}
+
+/* Standardizing spacing between input fields and their remove buttons */
+.remove-button {
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.remove-button:hover {
+  background-color: #e63939;
+}
+
+/* Better spacing for dynamic lists like ULOs, Criteria, etc. */
+.add-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.add-button:hover {
+  background-color: #218838;
+}
+
+/* Improved responsiveness for smaller screens */
+@media (max-width: 600px) {
   .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%; /* Make the popup take up most of the screen width */
-    max-width: 800px; /* Set a max width for larger screens */
-    max-height: 90vh; /* Set a max height to ensure everything fits on screen */
-    overflow-y: auto; /* Enable scrolling if content overflows vertically */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  label {
-    margin-bottom: 10px;
-    font-size: 14px;
-  }
-  
-  input, textarea {
-    margin-top: 5px;
-    padding: 10px; /* Increased padding for better touch interaction */
-    font-size: 16px; /* Make the font size a bit larger for readability */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%; /* Ensure inputs take up the full width */
-    box-sizing: border-box; /* Ensure padding doesn't increase the width beyond container */
+    padding: 15px;
+    max-width: 100%;
   }
 
-  textarea {
-    resize: vertical; /* Allow resizing of textareas only vertically */
+  button, .add-button, .remove-button {
+    width: 100%; /* Full-width buttons for mobile */
   }
-  
-  button {
-    margin-top: 15px;
-    padding: 12px; /* Increase padding for better button size */
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%; /* Make buttons stretch to full width for better touch interaction */
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-
-  /* Style for individual sections like Keywords, Competencies, Skills, and Knowledge */
-  .criterion-section, .ulo-section {
-    margin-bottom: 20px;
-  }
-
-  .criterion-section h4, .ulo-section h4 {
-    margin-top: 15px;
-    font-size: 16px;
-  }
-
-  .keyword-field, .competency-field, .skill-field, .knowledge-field {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .keyword-field input, .competency-field input, .skill-field input, .knowledge-field input {
-    flex-grow: 1;
-    margin-right: 10px; /* Space between input and remove button */
-  }
-
-  .popup-content button {
-    width: auto; /* Allow buttons inside sections to have a smaller width */
-  }
+}

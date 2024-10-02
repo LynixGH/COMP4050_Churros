@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import '@/app/styles/CreateRubricPopup.css';
 
@@ -19,7 +21,20 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
 
   useEffect(() => {
     if (existingRubric) {
-      setRubric(existingRubric);
+      // Ensure existing rubric has criteria and ulos arrays, or default to empty arrays
+      setRubric({
+        ...existingRubric,
+        criteria: existingRubric.criteria || [
+          {
+            criterion: '',
+            keywords: [''],
+            competencies: [''],
+            skills: [''],
+            knowledge: [''],
+          },
+        ],
+        ulos: existingRubric.ulos || [''],
+      });
     }
   }, [existingRubric]);
 
@@ -125,7 +140,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
           />
 
           <h3>Criteria</h3>
-          {rubric.criteria.map((criterion, index) => (
+          {rubric.criteria?.map((criterion, index) => (
             <div key={index} className="criterion-section">
               <label>Criterion {index + 1}:</label>
               <input
@@ -147,7 +162,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
               </button>
 
               <label>Keywords:</label>
-              {criterion.keywords.map((keyword, kIndex) => (
+              {criterion.keywords?.map((keyword, kIndex) => (
                 <div key={kIndex} className="field-row">
                   <input
                     type="text"
@@ -176,7 +191,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
               </button>
 
               <label>Competencies:</label>
-              {criterion.competencies.map((competency, cIndex) => (
+              {criterion.competencies?.map((competency, cIndex) => (
                 <div key={cIndex} className="field-row">
                   <input
                     type="text"
@@ -207,7 +222,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
               </button>
 
               <label>Skills:</label>
-              {criterion.skills.map((skill, sIndex) => (
+              {criterion.skills?.map((skill, sIndex) => (
                 <div key={sIndex} className="field-row">
                   <input
                     type="text"
@@ -233,7 +248,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
               </button>
 
               <label>Knowledge:</label>
-              {criterion.knowledge.map((knowledgeItem, kIndex) => (
+              {criterion.knowledge?.map((knowledgeItem, kIndex) => (
                 <div key={kIndex} className="field-row">
                   <input
                     type="text"
@@ -266,7 +281,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
           </button>
 
           <h3>Unit Learning Outcomes (ULOs)</h3>
-          {rubric.ulos.map((ulo, index) => (
+          {rubric.ulos?.map((ulo, index) => (
             <div key={index} className="field-row">
               <input
                 type="text"
@@ -288,7 +303,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
 
           <button type="submit">Submit</button>
           <button type="button" onClick={() => onClose(null)}>
-            Cancel
+              Cancel
           </button>
         </form>
       </div>
