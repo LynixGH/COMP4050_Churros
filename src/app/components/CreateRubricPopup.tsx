@@ -1,220 +1,296 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import '@/app/styles/CreateRubricPopup.css'; // Update CSS as necessary
+import React, { useState, useEffect } from 'react';
+import '@/app/styles/CreateRubricPopup.css';
 
-interface CreateRubricPopupProps {
-  onClose: () => void;
-}
+const CreateRubricPopup = ({ onClose, existingRubric }) => {
+  const [rubric, setRubric] = useState({
+    staff_email: '',
+    assessment_description: '',
+    criteria: [
+      {
+        criterion: '',
+        keywords: [''],
+        competencies: [''],
+        skills: [''],
+        knowledge: [''],
+      },
+    ],
+    ulos: [''],
+  });
 
-const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({ onClose }) => {
-  const [staffEmail, setStaffEmail] = useState('');
-  const [assessmentDescription, setAssessmentDescription] = useState('');
-  const [criteria, setCriteria] = useState([
-    { criterion: '', keywords: [''], competencies: [''], skills: [''], knowledge: [''] },
-  ]);
-  const [ulos, setUlos] = useState(['']);
-
-  // Handle criterion field change
-  const handleCriterionChange = (index: number, field: string, value: string) => {
-    const updatedCriteria = [...criteria];
-    updatedCriteria[index] = { ...updatedCriteria[index], [field]: value };
-    setCriteria(updatedCriteria);
-  };
-
-  // Handle array field changes (keywords, competencies, skills, knowledge)
-  const handleArrayChange = (index: number, field: string, subIndex: number, value: string) => {
-    const updatedCriteria = [...criteria];
-    updatedCriteria[index][field][subIndex] = value;
-    setCriteria(updatedCriteria);
-  };
-
-  // Add or remove entries in array fields (keywords, competencies, skills, knowledge)
-  const addArrayItem = (index: number, field: string) => {
-    const updatedCriteria = [...criteria];
-    updatedCriteria[index][field] = [...updatedCriteria[index][field], ''];
-    setCriteria(updatedCriteria);
-  };
-
-  const removeArrayItem = (index: number, field: string, subIndex: number) => {
-    const updatedCriteria = [...criteria];
-    updatedCriteria[index][field] = updatedCriteria[index][field].filter((_, i) => i !== subIndex);
-    setCriteria(updatedCriteria);
-  };
-
-  // Add and remove criteria
-  const addCriterion = () => {
-    setCriteria([...criteria, { criterion: '', keywords: [''], competencies: [''], skills: [''], knowledge: [''] }]);
-  };
-
-  const removeCriterion = (index: number) => {
-    setCriteria(criteria.filter((_, i) => i !== index));
-  };
-
-  // Handle ULO changes
-  const handleUloChange = (index: number, value: string) => {
-    const updatedUlos = [...ulos];
-    updatedUlos[index] = value;
-    setUlos(updatedUlos);
-  };
-
-  // Add or remove ULOs
-  const addUlo = () => setUlos([...ulos, '']);
-  const removeUlo = (index: number) => setUlos(ulos.filter((_, i) => i !== index));
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const rubricData = {
-      staff_email: staffEmail,
-      assessment_description: assessmentDescription,
-      criteria,
-      ulos,
-    };
-
-    try {
-      await axios.post('http://54.206.102.192/generate_rubric', rubricData);
-      alert('Rubric uploaded successfully');
-      onClose(); // Close the popup after submission
-    } catch (error) {
-      console.error('Failed to upload rubric', error);
-      alert('Error uploading rubric');
+  useEffect(() => {
+    if (existingRubric) {
+      setRubric(existingRubric);
     }
+  }, [existingRubric]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      [name]: value,
+    }));
+  };
+
+  // Add new criterion
+  const addCriterion = () => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      criteria: [
+        ...prevRubric.criteria,
+        {
+          criterion: '',
+          keywords: [''],
+          competencies: [''],
+          skills: [''],
+          knowledge: [''],
+        },
+      ],
+    }));
+  };
+
+  // Remove criterion
+  const removeCriterion = (index) => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      criteria: prevRubric.criteria.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Add new ULO
+  const addULO = () => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      ulos: [...prevRubric.ulos, ''],
+    }));
+  };
+
+  // Add a single new field (keyword, competency, skill, or knowledge) for a specific criterion
+  const addFieldToCriterion = (index, field) => {
+    const updatedCriteria = [...rubric.criteria];
+    updatedCriteria[index] = {
+      ...updatedCriteria[index],
+      [field]: [...updatedCriteria[index][field], ''],
+    };
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      criteria: updatedCriteria,
+    }));
+  };
+
+  // Remove field (keyword, competency, skill, or knowledge)
+  const removeFieldFromCriterion = (index, field, fieldIndex) => {
+    const updatedCriteria = [...rubric.criteria];
+    updatedCriteria[index][field] = updatedCriteria[index][field].filter(
+      (_, i) => i !== fieldIndex
+    );
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      criteria: updatedCriteria,
+    }));
+  };
+
+  // Remove ULO
+  const removeULO = (uloIndex) => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      ulos: prevRubric.ulos.filter((_, index) => index !== uloIndex),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onClose(rubric); // Pass updated rubric back to parent
   };
 
   return (
     <div className="popup-container">
       <div className="popup-content">
-        <h2>Create Rubric</h2>
+        <h2>{existingRubric ? 'Edit Rubric' : 'Create New Rubric'}</h2>
         <form onSubmit={handleSubmit}>
-          <label>
-            Staff Email:
-            <input
-              type="email"
-              value={staffEmail}
-              onChange={(e) => setStaffEmail(e.target.value)}
-              required
-            />
-          </label>
+          <label htmlFor="staff_email">Staff Email:</label>
+          <input
+            type="email"
+            id="staff_email"
+            name="staff_email"
+            value={rubric.staff_email}
+            onChange={handleChange}
+          />
 
-          <label>
-            Assessment Description:
-            <textarea
-              value={assessmentDescription}
-              onChange={(e) => setAssessmentDescription(e.target.value)}
-              required
-            />
-          </label>
+          <label htmlFor="assessment_description">Assessment Description:</label>
+          <textarea
+            id="assessment_description"
+            name="assessment_description"
+            value={rubric.assessment_description}
+            onChange={handleChange}
+          />
 
           <h3>Criteria</h3>
-          {criteria.map((criterion, index) => (
+          {rubric.criteria.map((criterion, index) => (
             <div key={index} className="criterion-section">
-              <label>
-                Criterion:
-                <input
-                  type="text"
-                  value={criterion.criterion}
-                  onChange={(e) => handleCriterionChange(index, 'criterion', e.target.value)}
-                  required
-                />
-              </label>
+              <label>Criterion {index + 1}:</label>
+              <input
+                type="text"
+                name={`criterion-${index}`}
+                value={criterion.criterion}
+                onChange={(e) => {
+                  const updatedCriteria = [...rubric.criteria];
+                  updatedCriteria[index].criterion = e.target.value;
+                  setRubric({ ...rubric, criteria: updatedCriteria });
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => removeCriterion(index)}
+                className="remove-btn"
+              >
+                Remove Criterion
+              </button>
 
-              <h4>Keywords</h4>
-              {criterion.keywords.map((keyword, subIndex) => (
-                <div key={subIndex} className="keyword-field">
+              <label>Keywords:</label>
+              {criterion.keywords.map((keyword, kIndex) => (
+                <div key={kIndex} className="field-row">
                   <input
                     type="text"
                     value={keyword}
-                    onChange={(e) => handleArrayChange(index, 'keywords', subIndex, e.target.value)}
-                    required
+                    onChange={(e) => {
+                      const updatedKeywords = [...rubric.criteria[index].keywords];
+                      updatedKeywords[kIndex] = e.target.value;
+                      const updatedCriteria = [...rubric.criteria];
+                      updatedCriteria[index].keywords = updatedKeywords;
+                      setRubric({ ...rubric, criteria: updatedCriteria });
+                    }}
                   />
-                  <button type="button" onClick={() => removeArrayItem(index, 'keywords', subIndex)}>
+                  <button
+                    type="button"
+                    onClick={() => removeFieldFromCriterion(index, 'keywords', kIndex)}
+                  >
                     Remove
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={() => addArrayItem(index, 'keywords')}>
+              <button
+                type="button"
+                onClick={() => addFieldToCriterion(index, 'keywords')}
+              >
                 Add Keyword
               </button>
 
-              <h4>Competencies</h4>
-              {criterion.competencies.map((competency, subIndex) => (
-                <div key={subIndex} className="competency-field">
+              <label>Competencies:</label>
+              {criterion.competencies.map((competency, cIndex) => (
+                <div key={cIndex} className="field-row">
                   <input
                     type="text"
                     value={competency}
-                    onChange={(e) => handleArrayChange(index, 'competencies', subIndex, e.target.value)}
-                    required
+                    onChange={(e) => {
+                      const updatedCompetencies = [...rubric.criteria[index].competencies];
+                      updatedCompetencies[cIndex] = e.target.value;
+                      const updatedCriteria = [...rubric.criteria];
+                      updatedCriteria[index].competencies = updatedCompetencies;
+                      setRubric({ ...rubric, criteria: updatedCriteria });
+                    }}
                   />
-                  <button type="button" onClick={() => removeArrayItem(index, 'competencies', subIndex)}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeFieldFromCriterion(index, 'competencies', cIndex)
+                    }
+                  >
                     Remove
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={() => addArrayItem(index, 'competencies')}>
+              <button
+                type="button"
+                onClick={() => addFieldToCriterion(index, 'competencies')}
+              >
                 Add Competency
               </button>
 
-              <h4>Skills</h4>
-              {criterion.skills.map((skill, subIndex) => (
-                <div key={subIndex} className="skill-field">
+              <label>Skills:</label>
+              {criterion.skills.map((skill, sIndex) => (
+                <div key={sIndex} className="field-row">
                   <input
                     type="text"
                     value={skill}
-                    onChange={(e) => handleArrayChange(index, 'skills', subIndex, e.target.value)}
-                    required
+                    onChange={(e) => {
+                      const updatedSkills = [...rubric.criteria[index].skills];
+                      updatedSkills[sIndex] = e.target.value;
+                      const updatedCriteria = [...rubric.criteria];
+                      updatedCriteria[index].skills = updatedSkills;
+                      setRubric({ ...rubric, criteria: updatedCriteria });
+                    }}
                   />
-                  <button type="button" onClick={() => removeArrayItem(index, 'skills', subIndex)}>
+                  <button
+                    type="button"
+                    onClick={() => removeFieldFromCriterion(index, 'skills', sIndex)}
+                  >
                     Remove
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={() => addArrayItem(index, 'skills')}>
+              <button type="button" onClick={() => addFieldToCriterion(index, 'skills')}>
                 Add Skill
               </button>
 
-              <h4>Knowledge</h4>
-              {criterion.knowledge.map((knowledgeItem, subIndex) => (
-                <div key={subIndex} className="knowledge-field">
+              <label>Knowledge:</label>
+              {criterion.knowledge.map((knowledgeItem, kIndex) => (
+                <div key={kIndex} className="field-row">
                   <input
                     type="text"
                     value={knowledgeItem}
-                    onChange={(e) => handleArrayChange(index, 'knowledge', subIndex, e.target.value)}
-                    required
+                    onChange={(e) => {
+                      const updatedKnowledge = [...rubric.criteria[index].knowledge];
+                      updatedKnowledge[kIndex] = e.target.value;
+                      const updatedCriteria = [...rubric.criteria];
+                      updatedCriteria[index].knowledge = updatedKnowledge;
+                      setRubric({ ...rubric, criteria: updatedCriteria });
+                    }}
                   />
-                  <button type="button" onClick={() => removeArrayItem(index, 'knowledge', subIndex)}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeFieldFromCriterion(index, 'knowledge', kIndex)
+                    }
+                  >
                     Remove
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={() => addArrayItem(index, 'knowledge')}>
+              <button type="button" onClick={() => addFieldToCriterion(index, 'knowledge')}>
                 Add Knowledge
               </button>
-
-              <button type="button" onClick={() => removeCriterion(index)}>Remove Criterion</button>
             </div>
           ))}
-          <button type="button" onClick={addCriterion}>Add Criterion</button>
+          <button type="button" onClick={addCriterion}>
+            Add Criterion
+          </button>
 
-          <h3>ULOs</h3>
-          {ulos.map((ulo, index) => (
-            <div key={index} className="ulo-section">
-              <label>
-                ULO:
-                <input
-                  type="text"
-                  value={ulo}
-                  onChange={(e) => handleUloChange(index, e.target.value)}
-                  required
-                />
-              </label>
-              <button type="button" onClick={() => removeUlo(index)}>Remove ULO</button>
+          <h3>Unit Learning Outcomes (ULOs)</h3>
+          {rubric.ulos.map((ulo, index) => (
+            <div key={index} className="field-row">
+              <input
+                type="text"
+                value={ulo}
+                onChange={(e) => {
+                  const updatedUlos = [...rubric.ulos];
+                  updatedUlos[index] = e.target.value;
+                  setRubric({ ...rubric, ulos: updatedUlos });
+                }}
+              />
+              <button type="button" onClick={() => removeULO(index)}>
+                Remove
+              </button>
             </div>
           ))}
-          <button type="button" onClick={addUlo}>Add ULO</button>
+          <button type="button" onClick={addULO}>
+            Add ULO
+          </button>
 
-          <button type="submit">Create Rubric</button>
+          <button type="submit">Submit</button>
+          <button type="button" onClick={() => onClose(null)}>
+            Cancel
+          </button>
         </form>
-        <button onClick={onClose}>Close</button>
       </div>
     </div>
   );
