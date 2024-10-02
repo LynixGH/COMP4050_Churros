@@ -37,7 +37,7 @@ label {
 
 input, textarea {
   margin-top: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   padding: 12px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -60,6 +60,7 @@ button {
   cursor: pointer;
   font-size: 16px;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 button:hover {
@@ -68,7 +69,7 @@ button:hover {
 
 /* Section Styling for better visual grouping */
 .criterion-section, .ulo-section {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .criterion-section h4, .ulo-section h4 {
