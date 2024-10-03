@@ -225,8 +225,26 @@ const QuestionTemplate: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           </div>
         </div>
-                {/* Number of Random Questions */}
-                <div className="mb-6 relative">
+               
+        {/* AI-Generated Questions Section */}
+        <h3 className="text-md font-semibold mb-4">AI-Generated Questions</h3>
+        {/* Difficulty Level Dropdown */}
+        <div className="mb-6 relative">
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            className="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select Difficulty Level
+            </option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+         {/* Number of Random Questions */}
+         <div className="mb-6 relative">
           <div className="relative border rounded px-2 py-1 w-full focus-within:ring-2 focus-within:ring-blue-500">
             <input
               type="number"
@@ -245,23 +263,6 @@ const QuestionTemplate: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </label>
           </div>
           <span className="text-xs text-gray-500 mt-1">e.g., 5</span>
-        </div>
-        {/* AI-Generated Questions Section */}
-        <h3 className="text-md font-semibold mb-4">AI-Generated Questions</h3>
-        {/* Difficulty Level Dropdown */}
-        <div className="mb-6 relative">
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="" disabled>
-              Select Difficulty Level
-            </option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-          </select>
         </div>
         {/* Number of Questions Inputs for Each Type */}
         {[
