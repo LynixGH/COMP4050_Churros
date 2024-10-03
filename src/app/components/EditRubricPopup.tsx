@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '@/app/styles/EditRubricPopup.css'; // Create a CSS file specific to Edit functionality
+import { UPDATE_RUBRIC } from '@/api';
 
 const EditRubricPopup = ({ onClose, existingRubric }) => {
-  const [rubric, setRubric] = useState(existingRubric);
+  const [rubric, setRubric] = useState({
+    ...existingRubric,
+    ulo_list: existingRubric?.ulo_list || [],  // Ensure ulo_list is initialized
+    grade_descriptors: existingRubric?.grade_descriptors || {}, // Ensure grade_descriptors is initialized
+  });
 
   useEffect(() => {
     if (existingRubric) {
-      setRubric(existingRubric); // Pre-fill form with existing rubric data when editing
+      setRubric({
+        ...existingRubric,
+        ulo_list: existingRubric?.ulo_list || [],  // Ensure ulo_list is initialized
+        grade_descriptors: existingRubric?.grade_descriptors || {}, // Ensure grade_descriptors is initialized
+      });
     }
   }, [existingRubric]);
 
@@ -27,18 +36,18 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
     setRubric((prevRubric) => ({ ...prevRubric, ulo_list: updatedUlos }));
   };
 
-  // Handle Grade Descriptor changes
-  const handleDescriptorChange = (index, name, value) => {
-    const updatedDescriptors = [...rubric.grade_descriptor_list];
-    updatedDescriptors[index].grade_descriptor_item[name] = value;
-    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptor_list: updatedDescriptors }));
+  // Handle changes in Grade Descriptors
+  const handleDescriptorChange = (grade, name, value) => {
+    const updatedDescriptors = { ...rubric.grade_descriptors };
+    updatedDescriptors[grade][name] = value;
+    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
-  // Handle Criterion changes inside Grade Descriptors
-  const handleCriterionChange = (descriptorIndex, criterionIndex, name, value) => {
-    const updatedDescriptors = [...rubric.grade_descriptor_list];
-    updatedDescriptors[descriptorIndex].grade_descriptor_item.criterion_list[criterionIndex][name] = value;
-    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptor_list: updatedDescriptors }));
+  // Handle changes in Criteria within Grade Descriptors
+  const handleCriterionChange = (grade, criterionIndex, name, value) => {
+    const updatedDescriptors = { ...rubric.grade_descriptors };
+    updatedDescriptors[grade].criterion[criterionIndex][name] = value;
+    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
   // Add/Remove ULOs
@@ -52,46 +61,24 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
     ulo_list: prevRubric.ulo_list.filter((_, i) => i !== index)
   }));
 
-  // Add/Remove Grade Descriptor
-  const addDescriptor = () => setRubric((prevRubric) => ({
-    ...prevRubric,
-    grade_descriptor_list: [
-      ...prevRubric.grade_descriptor_list,
-      {
-        grade_descriptor_item: {
-          grade_descriptor_name: '',
-          mark_min: '',
-          mark_max: '',
-          criterion_list: [{ criteria_name: '', criteria_description: '' }]
-        }
-      }
-    ]
-  }));
-
-  const removeDescriptor = (index) => setRubric((prevRubric) => ({
-    ...prevRubric,
-    grade_descriptor_list: prevRubric.grade_descriptor_list.filter((_, i) => i !== index)
-  }));
-
-  // Add/Remove Criterion inside a specific Grade Descriptor
-  const addCriterion = (descriptorIndex) => {
-    const updatedDescriptors = [...rubric.grade_descriptor_list];
-    updatedDescriptors[descriptorIndex].grade_descriptor_item.criterion_list.push({ criteria_name: '', criteria_description: '' });
-    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptor_list: updatedDescriptors }));
+  // Add/Remove Criteria inside a specific Grade Descriptor
+  const addCriterion = (grade) => {
+    const updatedDescriptors = { ...rubric.grade_descriptors };
+    updatedDescriptors[grade].criterion.push({ criteria_name: '', criteria_description: '' });
+    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
-  const removeCriterion = (descriptorIndex, criterionIndex) => {
-    const updatedDescriptors = [...rubric.grade_descriptor_list];
-    updatedDescriptors[descriptorIndex].grade_descriptor_item.criterion_list = updatedDescriptors[descriptorIndex].grade_descriptor_item.criterion_list.filter((_, i) => i !== criterionIndex);
-    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptor_list: updatedDescriptors }));
+  const removeCriterion = (grade, criterionIndex) => {
+    const updatedDescriptors = { ...rubric.grade_descriptors };
+    updatedDescriptors[grade].criterion = updatedDescriptors[grade].criterion.filter((_, i) => i !== criterionIndex);
+    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
   // Submit updated rubric using PUT request
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send PUT request to update the rubric
-      const response = await axios.put('http://3.27.205.64/rubric/1', rubric);
+      const response = await axios.put(UPDATE_RUBRIC(7), rubric);
       if (response.status === 200) {
         alert('Rubric updated successfully!');
         onClose(rubric); // Pass updated rubric back to parent component after successful update
@@ -118,75 +105,71 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
           />
 
           <h3>Unit Learning Outcomes (ULOs)</h3>
-          {rubric.ulo_list.map((ulo, index) => (
-            <div key={index} className="dynamic-list-item">
-              <textarea
-                value={ulo.ulo_item}
-                onChange={(e) => handleUloChange(index, e.target.value)}
-                required
-              />
-              <button type="button" className="remove-button" onClick={() => removeUlo(index)}>
-                Remove ULO
-              </button>
-            </div>
-          ))}
+          {/* Add a check for ulo_list to ensure it is defined and is an array */}
+          {rubric.ulo_list && rubric.ulo_list.length > 0 ? (
+            rubric.ulo_list.map((ulo, index) => (
+              <div key={index} className="dynamic-list-item">
+                <textarea
+                  value={ulo.ulo_item}
+                  onChange={(e) => handleUloChange(index, e.target.value)}
+                  required
+                />
+                <button type="button" className="remove-button" onClick={() => removeUlo(index)}>
+                  Remove ULO
+                </button>
+              </div>
+            ))
+          ) : (
+            <p>No ULOs available</p>
+          )}
           <button type="button" className="add-button" onClick={addUlo}>
             Add ULO
           </button>
 
           <h3>Grade Descriptors</h3>
-          {rubric.grade_descriptor_list.map((descriptor, index) => (
+          {Object.entries(rubric.grade_descriptors).map(([grade, descriptor], index) => (
             <div key={index} className="descriptor-item">
-              <label>Grade Name:</label>
-              <input
-                type="text"
-                value={descriptor.grade_descriptor_item.grade_descriptor_name}
-                onChange={(e) => handleDescriptorChange(index, 'grade_descriptor_name', e.target.value)}
-                required
-              />
+              <h4>{grade}</h4>
 
               <label>Min Mark:</label>
               <input
                 type="number"
-                value={descriptor.grade_descriptor_item.mark_min}
-                onChange={(e) => handleDescriptorChange(index, 'mark_min', e.target.value)}
+                value={descriptor.mark_min}
+                onChange={(e) => handleDescriptorChange(grade, 'mark_min', e.target.value)}
                 required
               />
 
               <label>Max Mark:</label>
               <input
                 type="number"
-                value={descriptor.grade_descriptor_item.mark_max}
-                onChange={(e) => handleDescriptorChange(index, 'mark_max', e.target.value)}
+                value={descriptor.mark_max}
+                onChange={(e) => handleDescriptorChange(grade, 'mark_max', e.target.value)}
                 required
               />
 
               <h4>Criteria</h4>
-              {descriptor.grade_descriptor_item.criterion_list.map((criterion, cIndex) => (
+              {descriptor.criterion.map((criterion, cIndex) => (
                 <div key={cIndex} className="criterion-item">
                   <label>Criteria Name:</label>
                   <input
                     type="text"
                     value={criterion.criteria_name}
-                    onChange={(e) => handleCriterionChange(index, cIndex, 'criteria_name', e.target.value)}
+                    onChange={(e) => handleCriterionChange(grade, cIndex, 'criteria_name', e.target.value)}
                     required
                   />
 
                   <label>Criteria Description:</label>
                   <textarea
                     value={criterion.criteria_description}
-                    onChange={(e) => handleCriterionChange(index, cIndex, 'criteria_description', e.target.value)}
+                    onChange={(e) => handleCriterionChange(grade, cIndex, 'criteria_description', e.target.value)}
                     required
                   />
-                  <button type="button" onClick={() => removeCriterion(index, cIndex)}>Remove Criterion</button>
+                  <button type="button" onClick={() => removeCriterion(grade, cIndex)}>Remove Criterion</button>
                 </div>
               ))}
-              <button type="button" onClick={() => addCriterion(index)}>Add Criterion</button>
-
-              <button type="button" onClick={() => removeDescriptor(index)}>Remove Descriptor</button>
+              <button type="button" onClick={() => addCriterion(grade)}>Add Criterion</button>
             </div>
           ))}
-          <button type="button" onClick={addDescriptor}>Add Grade Descriptor</button>
 
           <button type="submit">Update Rubric</button>
         </form>

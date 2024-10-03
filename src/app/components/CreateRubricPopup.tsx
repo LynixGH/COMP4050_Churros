@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '@/app/styles/CreateRubricPopup.css';
-//import '@/api.tsx';
+import { GENERATE_RUBRIC } from '@/api';
 
 const CreateRubricPopup = ({ onClose, existingRubric }) => {
   const [rubric, setRubric] = useState({
@@ -110,9 +110,9 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://3.27.122.31/generate_rubric', rubric);
+      const response = await axios.post(GENERATE_RUBRIC, rubric);
       if (response.status === 200) {
-        alert('Rubric submitted successfully!');
+       console.log('Rubric submitted successfully!');
         onClose(); // Close the form after submission
       }
     } catch (error) {
