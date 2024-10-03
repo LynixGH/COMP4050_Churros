@@ -6,6 +6,7 @@ import Tutors from '@/app/components/TutorList'; // Import the Tutors component
 import axios from 'axios';
 import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
 import '@/app/styles/unitDashboard.css'; // Import the CSS file
+import { GET_UNITS } from '@/api';
 
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
@@ -41,12 +42,12 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: s
 };
 
 export default function UnitDashboard({ params }: { params: { unitDashboard: string } }) {
-  const unitName = params.unitDashboard;
+  const unitCode = params.unitDashboard;
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
   const [error, setError] = useState<string | null>(null); // State for error messages
 
-  axios.get(`http://54.206.102.192/units/${unitName}`)
+  axios.get(GET_UNITS)
     .then(response => {
       if (response.status === 404) {
         console.log('Failed to load');
@@ -63,7 +64,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
       project_name: newProjectName
     };
 
-    axios.post(`http://54.206.102.192/units/${unitName}/projects`, projectData)
+    axios.post(`http://3.27.122.31/units/${unitCode}/projects`, projectData)
       .then(response => {
         console.log("Project created successfully:", response.data);
         setModalOpen(false); // Close the modal
@@ -80,7 +81,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
     const formData = new FormData();
     formData.append('file', file);
 
-    axios.post(`http://54.206.102.192/units/${unitName}/students`, formData, {
+    axios.post(`http://54.206.102.192/units/${unitCode}/students`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -98,7 +99,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
 
   return (
     <div className="container">
-      <h1>{unitName} Dashboard</h1>
+      <h1>{unitCode} Dashboard</h1>
 
       {/* Button to open the modal for creating a new project */}
       <button onClick={() => setModalOpen(true)} className="create-button">
@@ -128,13 +129,13 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
         {/* Section for displaying assignments */}
         <div className="assignments">
           <h2>Assignments</h2>
-          <Assignments project_name='AssignmentName' unit_code={unitName}/> {/* Call the Assignments component */}
+          <Assignments project_name='AssignmentName' unit_code={unitCode}/> {/* Call the Assignments component */}
         </div>
 
         {/* Section for displaying tutors */}
         <div className="tutors">
           {/* <h2>Tutors</h2> */}
-          <Tutors unitCode={unitName}/> {/* Call the Tutors component */}
+          <Tutors unitCode={unitCode}/> {/* Call the Tutors component */}
         </div>
       </div>
     </div>

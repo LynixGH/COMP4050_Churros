@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '@/app/styles/CreateUnitPopup.css'; // Import CSS for the popup
+import { POST_UNIT } from '@/api';
 
 interface CreateUnitPopupProps {
   onClose: () => void;
@@ -26,7 +27,7 @@ const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose }) => {
     };
 
     try {
-      await axios.post('http://54.206.102.192/units', newUnit);
+      await axios.post(POST_UNIT, newUnit);
       alert('Unit created successfully');
       onClose(); // Close the popup after submission
     } catch (error) {

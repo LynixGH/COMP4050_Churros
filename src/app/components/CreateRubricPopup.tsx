@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '@/app/styles/CreateRubricPopup.css';
+//import '@/api.tsx';
 
 const CreateRubricPopup = ({ onClose, existingRubric }) => {
   const [rubric, setRubric] = useState({
@@ -21,7 +23,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
 
   useEffect(() => {
     if (existingRubric) {
-      // Ensure existing rubric has criteria and ulos arrays, or default to empty arrays
       setRubric({
         ...existingRubric,
         criteria: existingRubric.criteria || [
@@ -46,7 +47,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Add new criterion
   const addCriterion = () => {
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -63,7 +63,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Remove criterion
   const removeCriterion = (index) => {
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -71,7 +70,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Add new ULO
   const addULO = () => {
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -79,7 +77,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Add a single new field (keyword, competency, skill, or knowledge) for a specific criterion
   const addFieldToCriterion = (index, field) => {
     const updatedCriteria = [...rubric.criteria];
     updatedCriteria[index] = {
@@ -92,7 +89,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Remove field (keyword, competency, skill, or knowledge)
   const removeFieldFromCriterion = (index, field, fieldIndex) => {
     const updatedCriteria = [...rubric.criteria];
     updatedCriteria[index][field] = updatedCriteria[index][field].filter(
@@ -104,7 +100,6 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Remove ULO
   const removeULO = (uloIndex) => {
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -112,9 +107,18 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onClose(rubric); // Pass updated rubric back to parent
+    try {
+      const response = await axios.post('http://3.27.122.31/generate_rubric', rubric);
+      if (response.status === 200) {
+        alert('Rubric submitted successfully!');
+        onClose(); // Close the form after submission
+      }
+    } catch (error) {
+      console.error('Error submitting rubric:', error);
+      alert('Failed to submit rubric. Please try again.');
+    }
   };
 
   return (
@@ -129,6 +133,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
             name="staff_email"
             value={rubric.staff_email}
             onChange={handleChange}
+            required
           />
 
           <label htmlFor="assessment_description">Assessment Description:</label>
@@ -137,6 +142,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
             name="assessment_description"
             value={rubric.assessment_description}
             onChange={handleChange}
+            required
           />
 
           <h3>Criteria</h3>
@@ -152,6 +158,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
                   updatedCriteria[index].criterion = e.target.value;
                   setRubric({ ...rubric, criteria: updatedCriteria });
                 }}
+                required
               />
               <button
                 type="button"

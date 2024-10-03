@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '@/app/styles/EditRubricPopup.css'; // Create a CSS file specific to Edit functionality
 
 const EditRubricPopup = ({ onClose, existingRubric }) => {
@@ -85,9 +86,20 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
     setRubric((prevRubric) => ({ ...prevRubric, grade_descriptor_list: updatedDescriptors }));
   };
 
-  const handleSubmit = (e) => {
+  // Submit updated rubric using PUT request
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onClose(rubric); // Pass updated rubric back to parent component
+    try {
+      // Send PUT request to update the rubric
+      const response = await axios.put('http://3.27.205.64/rubric/1', rubric);
+      if (response.status === 200) {
+        alert('Rubric updated successfully!');
+        onClose(rubric); // Pass updated rubric back to parent component after successful update
+      }
+    } catch (error) {
+      console.error('Error updating rubric:', error);
+      alert('Failed to update rubric. Please try again.');
+    }
   };
 
   return (
@@ -95,7 +107,6 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
       <div className="popup-content">
         <h2>Edit Rubric</h2>
         <form onSubmit={handleSubmit}>
-          {/* Fields pre-filled with `existingRubric` */}
           <label htmlFor="rubric_title">Rubric Title:</label>
           <input
             type="text"
@@ -108,20 +119,20 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
 
           <h3>Unit Learning Outcomes (ULOs)</h3>
           {rubric.ulo_list.map((ulo, index) => (
-                        <div key={index} className="dynamic-list-item">
-                        <textarea
-                  value={ulo.ulo_item}
-                  onChange={(e) => handleUloChange(index, e.target.value)}
-                  required
-                />
-                <button type="button" className="remove-button" onClick={() => removeUlo(index)}>
-                  Remove ULO
-                </button>
-              </div>
-            ))}
-            <button type="button" className="add-button" onClick={addUlo}>
-              Add ULO
-            </button>
+            <div key={index} className="dynamic-list-item">
+              <textarea
+                value={ulo.ulo_item}
+                onChange={(e) => handleUloChange(index, e.target.value)}
+                required
+              />
+              <button type="button" className="remove-button" onClick={() => removeUlo(index)}>
+                Remove ULO
+              </button>
+            </div>
+          ))}
+          <button type="button" className="add-button" onClick={addUlo}>
+            Add ULO
+          </button>
 
           <h3>Grade Descriptors</h3>
           {rubric.grade_descriptor_list.map((descriptor, index) => (
