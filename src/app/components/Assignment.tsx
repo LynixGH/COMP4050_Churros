@@ -102,9 +102,10 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
   }
 
   return (
-    <Link href={`/dashboard/userDashboard/${unit_code}/${project_name}`} passHref>
+    
       <div style={styles.container}>
         {assignments.map((assignment) => (
+          <Link href={`/dashboard/userDashboard/${unit_code}/${project_name}`} passHref>
           <div key={assignment.project_id} style={styles.box}>
             <div style={styles.assignmentInfo}>
               <h3>{assignment.project_name || 'Unnamed Project'}</h3>
@@ -118,7 +119,9 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
               </div>
             )}
           </div>
+          </Link>
         ))}
+        
 
         {isEditMode ? (
           <button onClick={toggleEditMode} style={styles.cancelButton}>
@@ -148,7 +151,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
           </div>
         )}
       </div>
-    </Link>
+    
   );
 };
 
