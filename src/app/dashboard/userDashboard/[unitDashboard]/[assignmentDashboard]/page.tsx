@@ -1,16 +1,14 @@
-// assignmentDashboard.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
-// import {GET_UNITS} from '@/api';
 
-// const AssignmentDashboard: React.FC = () => {
-export default function AssignmentDashboard({ params }: { params: { AssignmentDashboard: string } }) {
-  
-  const [unitName, setUnitName] = useState<string>('CS101');
-  const [assignmentName, setAssignmentName] = useState<string>('Fastest Scheduling Algorithm');
+export default function AssignmentDashboard({ params }: { params: { unitCode: string; projectName: string } }) {
+  // Destructure the parameters
+  const { unitCode, projectName } = params; // Assuming params contains unitCode and projectName
+  const [unitName, setUnitName] = useState<string>(unitCode); // Use unit code from params
+  const [assignmentName, setAssignmentName] = useState<string>(projectName); // Use project name from params
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,11 +19,12 @@ export default function AssignmentDashboard({ params }: { params: { AssignmentDa
 
   useEffect(() => {
     fetchSubmissions();
-  }, []);
+  }, [unitCode, projectName]); // Dependency array updated
+
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get('http://54.206.102.192/units/CS101/projects/FastestSchedulingAlgorithm/files');
+      const response = await axios.get(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`); // Use dynamic URL
       setSubmissions(response.data.submission_files);
     } catch (err) {
       console.error("Error fetching submissions", err);
@@ -47,7 +46,7 @@ export default function AssignmentDashboard({ params }: { params: { AssignmentDa
       formData.append('file', selectedFile);
 
       try {
-        await axios.post('http://54.206.102.192/units/CS101/projects/FastestSchedulingAlgorithm/files', formData, {
+        await axios.post(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -74,7 +73,7 @@ export default function AssignmentDashboard({ params }: { params: { AssignmentDa
   const handleGenerateQuestions = async () => {
     if (selectedSubmissions.length > 0) {
       try {
-        const response = await axios.post('http://54.206.102.192/units/CS101/projects/FastestSchedulingAlgorithm/generate-questions', {
+        const response = await axios.post(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/generate-questions`, {
           submission_ids: selectedSubmissions,
         });
         console.log("Questions generated successfully:", response.data);
@@ -187,5 +186,3 @@ export default function AssignmentDashboard({ params }: { params: { AssignmentDa
     </div>
   );
 };
-
-// export default AssignmentDashboard;

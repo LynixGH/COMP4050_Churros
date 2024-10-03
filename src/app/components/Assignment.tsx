@@ -105,7 +105,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
     
       <div style={styles.container}>
         {assignments.map((assignment) => (
-          <Link href={`/dashboard/userDashboard/${unit_code}/${project_name}`} passHref>
+          <Link href={`/dashboard/userDashboard/${unit_code}/${assignment.project_name}`} passHref>
           <div key={assignment.project_id} style={styles.box}>
             <div style={styles.assignmentInfo}>
               <h3>{assignment.project_name || 'Unnamed Project'}</h3>
