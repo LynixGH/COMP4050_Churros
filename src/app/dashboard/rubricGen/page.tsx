@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';  // Import axios to make API requests
+import axios from 'axios';
 import '@/app/styles/rubricGen.css';
 import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
 import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
-//import '@/app/api.tsx';
+import { GET_RUBRIC } from '@/api';
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
@@ -47,7 +47,8 @@ const RubricGen = () => {
   useEffect(() => {
     const fetchRubric = async () => {
       try {
-        const response = await axios.get('http://3.27.205.64/rubric/1');
+        const response = await axios.get(GET_RUBRIC(7));
+        console.log('Fetched Rubric Data:', response.data);  // Log the fetched data
         setRubricData(response.data);  // Set the fetched rubric data to the state
       } catch (error) {
         console.error('Error fetching rubric data:', error);
@@ -57,6 +58,17 @@ const RubricGen = () => {
 
     fetchRubric();
   }, []); // Fetch data once when component mounts
+
+  // Helper function to render criteria
+  const renderCriteria = (criteria) => (
+    <ul>
+      {criteria.map((criterion, index) => (
+        <li key={index}>
+          <strong>{criterion.criteria_name}:</strong> {criterion.criteria_description}
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <div className="rubric-dashboard">
@@ -83,21 +95,11 @@ const RubricGen = () => {
               </tr>
             </thead>
             <tbody>
-              {rubricData.grade_descriptor_list?.map((descriptor, idx) => (
+              {Object.entries(rubricData.grade_descriptors).map(([grade, descriptor], idx) => (
                 <tr key={idx}>
-                  <td>{descriptor.grade_descriptor_item.grade_descriptor_name}</td>
-                  <td>
-                    {descriptor.grade_descriptor_item.mark_min} - {descriptor.grade_descriptor_item.mark_max}
-                  </td>
-                  <td>
-                    <ul>
-                      {descriptor.grade_descriptor_item.criterion_list?.map((criterion, cIdx) => (
-                        <li key={cIdx}>
-                          <strong>{criterion.criteria_name}:</strong> {criterion.criteria_description}
-                        </li>
-                      ))}
-                    </ul>
-                  </td>
+                  <td>{grade}</td>
+                  <td>{descriptor.mark_min} - {descriptor.mark_max}</td>
+                  <td>{renderCriteria(descriptor.criterion)}</td>
                 </tr>
               ))}
             </tbody>
