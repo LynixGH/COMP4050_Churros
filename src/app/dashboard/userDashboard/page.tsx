@@ -1,19 +1,19 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Axios is used for requests
 import UnitCard from '@/app/components/UnitCard'; // Import the UnitCard component
 import '@/app/styles/userDashboard.css'; // Import the dashboard styles
 import CreateUnitPopup from '@/app/components/CreateUnitPopup';
+import { GET_ALL_UNITS } from '@/app/API'; // Import the GET_ALL_UNITS from API.tsx
 
 interface Unit {
   unit_code: string;
   unit_name: string;
   year: string;
   session: string;
+  level: string;
 }
-
-// Define the constant for the API URL
-const API_URL = 'http://54.206.102.192/units';
 
 const UserDashboard = () => {
   const [units, setUnits] = useState<Unit[]>([]);
@@ -28,63 +28,29 @@ const UserDashboard = () => {
     setIsPopupOpen(false);
   };
 
+  // Callback to add the newly created unit to the list
+  const handleUnitCreated = (newUnit: Unit) => {
+    setUnits((prevUnits) => [...prevUnits, newUnit]); // Add the new unit to the existing units
+  };
+
   // Get current year and session based on the current date
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear().toString();
   const currentSession = currentDate.getMonth() < 6 ? 'S1' : 'S2'; // S1 for Jan-May, S2 for Jun-Dec
 
   useEffect(() => {
-    // Simulate fetching units with dummy data since backend is down
-    const dummyData: Unit[] = [
-      {
-        unit_code: 'COMP3100',
-        unit_name: 'Distributed Systems',
-        year: '2024',
-        session: 'S1',
-      },
-      {
-        unit_code: 'COMP3400',
-        unit_name: 'Software Engineering',
-        year: '2024',
-        session: 'S2',
-      },
-      {
-        unit_code: 'COMP3500',
-        unit_name: 'Database Systems',
-        year: '2024',
-        session: 'S1',
-      },
-      {
-        unit_code: 'COMP3600',
-        unit_name: 'Web Technologies',
-        year: '2023',
-        session: 'S1',
-      },
-      {
-        unit_code: 'COMP3700',
-        unit_name: 'Machine Learning',
-        year: '2021',
-        session: 'S1',
-      },
-      {
-        unit_code: 'COMP4500',
-        unit_name: 'Artificial Intelligence',
-        year: '2024',
-        session: 'S2',
-      },
-      {
-        unit_code: 'COMP4900',
-        unit_name: 'Cloud Computing',
-        year: '2024',
-        session: 'S1',
-      },
-    ];
+    // Fetch the units from the backend using the GET_ALL_UNITS endpoint
+    const fetchUnits = async () => {
+      try {
+        const response = await axios.get(GET_ALL_UNITS(convenerEmail));
+        setUnits(response.data); // Set the fetched data to the state
+      } catch (error) {
+        console.error('Error fetching units:', error);
+      }
+    };
 
-    // Mimic the async behavior of API requests
-    setTimeout(() => {
-      setUnits(dummyData);
-    }, 1000);
-  }, []);
+    fetchUnits();
+  }, [convenerEmail]);
 
   // Filter active and inactive units
   const activeUnits = units.filter(
@@ -106,9 +72,10 @@ const UserDashboard = () => {
 
   return (
     <div className="unit-dashboard">
-            <button onClick={handleOpenPopup}>Create New Unit</button>
+      <button onClick={handleOpenPopup}>Create New Unit</button>
 
-{isPopupOpen && <CreateUnitPopup onClose={handleClosePopup} />}
+      {isPopupOpen && <CreateUnitPopup onClose={handleClosePopup} convenerEmail={convenerEmail} onUnitCreated={handleUnitCreated} />} {/* Pass the email and callback */}
+
       <h2>Active Units</h2>
       <div className="units-section active-units">
         {activeUnits.length > 0 ? (
