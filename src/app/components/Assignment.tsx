@@ -1,5 +1,6 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
+import Link from 'next/link';
 import { GET_PROJECTS , DELETE_PROJECT, UPDATE_PROJECT} from '@/api';
 
 interface Assignment {
@@ -9,6 +10,7 @@ interface Assignment {
 }
 
 const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, project_name="ERROR"}) => {
+  
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,51 +102,53 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
   }
 
   return (
-    <div style={styles.container}>
-      {assignments.map((assignment) => (
-        <div key={assignment.project_id} style={styles.box}>
-          <div style={styles.assignmentInfo}>
-            <h3>{assignment.project_name || 'Unnamed Project'}</h3>
-            <p>Unit Code: {assignment.unit_code}</p>
-          </div>
-          
-          {isEditMode && (
-            <div style={styles.actions}>
-              <button style={styles.actionButton} onClick={() => handleEditClick(assignment)}>Edit</button>
-              <button style={styles.actionButton} onClick={() => handleDeleteClick(assignment)}>Delete</button>
+    <Link href={`/dashboard/userDashboard/${unit_code}/${project_name}`} passHref>
+      <div style={styles.container}>
+        {assignments.map((assignment) => (
+          <div key={assignment.project_id} style={styles.box}>
+            <div style={styles.assignmentInfo}>
+              <h3>{assignment.project_name || 'Unnamed Project'}</h3>
+              <p>Unit Code: {assignment.unit_code}</p>
             </div>
-          )}
-        </div>
-      ))}
+            
+            {isEditMode && (
+              <div style={styles.actions}>
+                <button style={styles.actionButton} onClick={() => handleEditClick(assignment)}>Edit</button>
+                <button style={styles.actionButton} onClick={() => handleDeleteClick(assignment)}>Delete</button>
+              </div>
+            )}
+          </div>
+        ))}
 
-      {isEditMode ? (
-        <button onClick={toggleEditMode} style={styles.cancelButton}>
-          Cancel Editing
-        </button>
-      ) : (
-        <button onClick={toggleEditMode} style={styles.editButton}>
-          Edit Assignments
-        </button>
-      )}
+        {isEditMode ? (
+          <button onClick={toggleEditMode} style={styles.cancelButton}>
+            Cancel Editing
+          </button>
+        ) : (
+          <button onClick={toggleEditMode} style={styles.editButton}>
+            Edit Assignments
+          </button>
+        )}
 
-      {selectedAssignment && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modalContent}>
-            <h2>Edit Project Name</h2>
-            <input 
-              type="text" 
-              value={newName} 
-              onChange={handleNameChange} 
-              style={styles.input} 
-            />
-            <div style={styles.modalActions}>
-              <button style={styles.saveButton} onClick={handleSave}>Save</button>
-              <button style={styles.cancelButton} onClick={handleCancel}>Cancel</button>
+        {selectedAssignment && (
+          <div style={styles.modalOverlay}>
+            <div style={styles.modalContent}>
+              <h2>Edit Project Name</h2>
+              <input 
+                type="text" 
+                value={newName} 
+                onChange={handleNameChange} 
+                style={styles.input} 
+              />
+              <div style={styles.modalActions}>
+                <button style={styles.saveButton} onClick={handleSave}>Save</button>
+                <button style={styles.cancelButton} onClick={handleCancel}>Cancel</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Link>
   );
 };
 
