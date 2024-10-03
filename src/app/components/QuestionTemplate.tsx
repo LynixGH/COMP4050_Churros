@@ -225,6 +225,27 @@ const QuestionTemplate: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           </div>
         </div>
+                {/* Number of Random Questions */}
+                <div className="mb-6 relative">
+          <div className="relative border rounded px-2 py-1 w-full focus-within:ring-2 focus-within:ring-blue-500">
+            <input
+              type="number"
+              value={randomQuestionsCount}
+              onChange={(e) => handleRandomQuestionsCountChange(e.target.value)}
+              placeholder=" " // Placeholder for the floating label effect
+              className="w-full focus:outline-none bg-transparent pt-2 pb-1" // Adjusted padding for height
+              min="1" // Allow only positive numbers
+              style={{ zIndex: 1 }} // Ensure the input is on top
+            />
+            <label 
+              className={`absolute left-2 transition-all duration-200 ease-in-out pointer-events-none
+              ${randomQuestionsCount ? 'text-blue-500 text-xs -top-2 bg-white px-1' : 'text-gray-500 top-2'}`} // Adjusted label position
+            >
+              Number of Random Questions
+            </label>
+          </div>
+          <span className="text-xs text-gray-500 mt-1">e.g., 5</span>
+        </div>
         {/* AI-Generated Questions Section */}
         <h3 className="text-md font-semibold mb-4">AI-Generated Questions</h3>
         {/* Difficulty Level Dropdown */}
