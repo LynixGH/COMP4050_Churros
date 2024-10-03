@@ -1,5 +1,6 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
+import { GET_PROJECTS , DELETE_PROJECT, UPDATE_PROJECT} from '@/api';
 
 interface Assignment {
   project_id?: number;
@@ -17,7 +18,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
 
   useEffect(() => {
     console.log('Did something rather than nothing');
-    axios.get(`http://54.206.102.192/units/${unit_code}/projects`)
+    axios.get(GET_PROJECTS(unit_code))
       .then(response => {
         console.log(response);
         if (response.status === 200 && response.data) {
@@ -48,8 +49,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
   };
 
   const handleDeleteClick = (assignment: Assignment) => {
-    console.log(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`);
-    axios.delete(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(assignment.project_name)}`)
+    axios.delete(DELETE_PROJECT(unit_code, assignment.project_name))
       .then(response => {
         setAssignments(prevAssignments => 
           prevAssignments.filter(a => a.project_id !== assignment.project_id)
@@ -70,7 +70,7 @@ const Assignments: React.FC<Assignment> = ({ unit_code = "", project_id = 0, pro
         project_name: newName
       };
 
-      axios.put(`http://54.206.102.192/units/${unit_code}/projects/${encodeURIComponent(selectedAssignment.project_name)}`, updatedAssignment)
+      axios.put(UPDATE_PROJECT(unit_code, selectedAssignment.project_name), updatedAssignment)
         .then(response => {
           setAssignments(prevAssignments => 
             prevAssignments.map(assignment => 

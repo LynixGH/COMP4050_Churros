@@ -2,8 +2,16 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { POST_STUDENTS } from '@/api';
 
-const UploadModal: React.FC<{ isOpen: boolean; onClose: () => void; }> = ({ isOpen, onClose }) => {
+interface UploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onUpload: (file: File) => void;
+  unit_code: string;
+}
+
+const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, unit_code}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +49,7 @@ const UploadModal: React.FC<{ isOpen: boolean; onClose: () => void; }> = ({ isOp
       formData.append('file', selectedFile);
 
       try {
-        const response = await axios.post('http://54.206.102.192/units/CS101/students', formData, {
+        const response = await axios.post(POST_STUDENTS(unit_code), formData, {
           headers: {
             'Content-Type': 'multipart/form-data', // Set content type for file upload
           },

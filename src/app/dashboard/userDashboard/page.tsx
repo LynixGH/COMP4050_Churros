@@ -5,7 +5,7 @@ import axios from 'axios'; // Axios is used for requests
 import UnitCard from '@/app/components/UnitCard'; // Import the UnitCard component
 import '@/app/styles/userDashboard.css'; // Import the dashboard styles
 import CreateUnitPopup from '@/app/components/CreateUnitPopup';
-import { GET_ALL_UNITS } from '@/app/API'; // Import the GET_ALL_UNITS from API.tsx
+import { GET_ALL_UNITS } from '@/api'; // Import the GET_ALL_UNITS from API.tsx
 
 interface Unit {
   unit_code: string;

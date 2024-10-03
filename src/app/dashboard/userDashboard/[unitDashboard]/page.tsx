@@ -6,7 +6,7 @@ import Tutors from '@/app/components/TutorList'; // Import the Tutors component
 import axios from 'axios';
 import UploadModal from '@/app/components/UploadModal'; // Import the UploadModal component
 import '@/app/styles/unitDashboard.css'; // Import the CSS file
-import { GET_UNITS } from '@/api';
+import { GET_PROJECTS, GET_ALL_UNITS , POST_STUDENTS} from '@/api';
 
 // Modal component to handle the project creation
 const Modal: React.FC<{ isOpen: boolean; onClose: () => void; onSubmit: (name: string) => void; }> = ({ isOpen, onClose, onSubmit }) => {
@@ -46,8 +46,9 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
   const [modalOpen, setModalOpen] = useState<boolean>(false); // State for modal visibility
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false); // State for upload modal visibility
   const [error, setError] = useState<string | null>(null); // State for error messages
-
-  axios.get(GET_UNITS)
+  // HARDCODED
+  const convenerEmail = 'convener2@example.com';
+  axios.get(GET_ALL_UNITS(convenerEmail))
     .then(response => {
       if (response.status === 404) {
         console.log('Failed to load');
@@ -64,7 +65,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
       project_name: newProjectName
     };
 
-    axios.post(`http://3.27.122.31/units/${unitCode}/projects`, projectData)
+    axios.post(GET_PROJECTS(unitCode), projectData)
       .then(response => {
         console.log("Project created successfully:", response.data);
         setModalOpen(false); // Close the modal
@@ -81,7 +82,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
     const formData = new FormData();
     formData.append('file', file);
 
-    axios.post(`http://54.206.102.192/units/${unitCode}/students`, formData, {
+    axios.post(POST_STUDENTS(unitCode), formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -122,6 +123,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
         isOpen={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}
         onUpload={handleFileUpload}
+        unit_code = {unitCode}
       />
 
       {/* Flex container to hold both Assignments and Tutors */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '@/app/styles/CreateUnitPopup.css'; // Import CSS for the popup
-import { POST_UNIT } from '@/app/API';
+import { POST_UNIT } from '@/api';
 
 interface CreateUnitPopupProps {
   onClose: () => void;
