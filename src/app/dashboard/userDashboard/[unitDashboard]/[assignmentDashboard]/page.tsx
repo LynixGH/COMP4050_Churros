@@ -6,7 +6,9 @@ import axios from 'axios';
 import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
 // import {GET_UNITS} from '@/api';
 
-const AssignmentDashboard: React.FC = () => {
+// const AssignmentDashboard: React.FC = () => {
+export default function AssignmentDashboard({ params }: { params: { AssignmentDashboard: string } }) {
+  
   const [unitName, setUnitName] = useState<string>('CS101');
   const [assignmentName, setAssignmentName] = useState<string>('Fastest Scheduling Algorithm');
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -186,4 +188,4 @@ const AssignmentDashboard: React.FC = () => {
   );
 };
 
-export default AssignmentDashboard;
+// export default AssignmentDashboard;
