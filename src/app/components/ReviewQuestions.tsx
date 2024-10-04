@@ -529,128 +529,128 @@ const formatCategoryName = (category: string) => {
 
 // Inline styles for the component
 const styles: { [key: string]: CSSProperties } = {
-  container: {
-    padding: "24px",
-    fontFamily: "Arial, sans-serif",
-  },
-  title: {
-    fontSize: "28px",
-    marginBottom: "24px",
-    textAlign: "center",
-  },
-  tabContainer: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "24px",
-  },
-  tab: {
-    padding: "12px 24px",
-    margin: "0 8px",
-    backgroundColor: "#f1f1f1",
-    border: "none",
-    borderRadius: "4px 4px 0 0",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-  activeTab: {
-    padding: "12px 24px",
-    margin: "0 8px",
-    backgroundColor: "#fff",
-    border: "1px solid #ccc",
-    borderBottom: "none",
-    borderRadius: "4px 4px 0 0",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-  tabContent: {
-    border: "1px solid #ccc",
-    borderRadius: "0 4px 4px 4px",
-    padding: "16px",
-    backgroundColor: "#fff",
-  },
-  category: {
-    marginBottom: "24px",
-  },
-  categoryHeader: {
-    fontSize: "20px",
-    marginBottom: "12px",
-    color: "#333",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  tableRowEven: {
-    backgroundColor: "#f9f9f9",
-  },
-  tableRowOdd: {
-    backgroundColor: "#fff",
-  },
-  tableRowSelected: {
-    backgroundColor: "#cce5ff",
-  },
-  questionText: {
-    padding: "12px",
-    border: "1px solid #ddd",
-    width: "85%",
-    verticalAlign: "top",
-    cursor: "pointer",
-  },
-  actionCell: {
-    padding: "12px",
-    border: "1px solid #ddd",
-    width: "15%",
-    textAlign: "right",
-  },
-  editButton: {
-    padding: "8px 16px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  saveButton: {
-    padding: "8px 16px",
-    backgroundColor: "#28a745",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    marginRight: "8px",
-  },
-  cancelButton: {
-    padding: "8px 16px",
-    backgroundColor: "#dc3545",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  randomButton: {
-    padding: "10px 20px",
-    backgroundColor: "#17a2b8", // Computer-friendly shade of blue
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    marginBottom: "16px",
-  },
-  regenButton: {
-    padding: "10px 20px",
-    backgroundColor: "#ffc107", // Yellow color
-    color: "#000",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    marginBottom: "16px",
-  },
-  input: {
-    width: "100%",
-    padding: "8px",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-  },
-};
+    container: {
+      padding: '24px',
+      fontFamily: 'Arial, sans-serif',
+    },
+    title: {
+      fontSize: '28px',
+      marginBottom: '24px',
+      textAlign: 'center',
+    },
+    tabContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginBottom: '24px',
+    },
+    tab: {
+      padding: '12px 24px',
+      margin: '0 8px',
+      backgroundColor: '#f1f1f1',
+      border: 'none',
+      borderRadius: '4px 4px 0 0',
+      cursor: 'pointer',
+      fontSize: '16px',
+    },
+    activeTab: {
+      padding: '12px 24px',
+      margin: '0 8px',
+      backgroundColor: '#fff',
+      border: '1px solid #ccc',
+      borderBottom: 'none',
+      borderRadius: '4px 4px 0 0',
+      cursor: 'pointer',
+      fontSize: '16px',
+    },
+    tabContent: {
+      border: '1px solid #ccc',
+      borderRadius: '0 4px 4px 4px',
+      padding: '16px',
+      backgroundColor: '#fff',
+    },
+    category: {
+      marginBottom: '24px',
+    },
+    categoryHeader: {
+      fontSize: '20px',
+      marginBottom: '12px',
+      color: '#333',
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse',
+    },
+    tableRowEven: {
+      backgroundColor: '#f9f9f9',
+    },
+    tableRowOdd: {
+      backgroundColor: '#fff',
+    },
+    tableRowSelected: {
+      backgroundColor: '#cce5ff',
+    },
+    questionText: {
+      padding: '12px',
+      border: '1px solid #ddd',
+      width: '85%',
+      verticalAlign: 'top',
+      cursor: 'pointer',
+    },
+    actionCell: {
+      padding: '12px',
+      border: '1px solid #ddd',
+      width: '15%',
+      textAlign: 'right',
+    },
+    editButton: {
+      padding: '8px 16px',
+      backgroundColor: '#007bff',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    },
+    saveButton: {
+      padding: '8px 16px',
+      backgroundColor: '#28a745',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      marginRight: '8px',
+    },
+    cancelButton: {
+      padding: '8px 16px',
+      backgroundColor: '#dc3545',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    },
+    randomButton: {
+      padding: '10px 20px',
+      backgroundColor: '#17a2b8', // Computer-friendly shade of blue
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      marginBottom: '16px',
+    },
+    regenButton: {
+      padding: '10px 20px',
+      backgroundColor: '#ffc107', // Yellow color
+      color: '#000',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      marginBottom: '16px',
+    },
+    input: {
+      width: '100%',
+      padding: '8px',
+      borderRadius: '4px',
+      border: '1px solid #ccc',
+    },
+  };
 
 export default ReviewQuestions;
