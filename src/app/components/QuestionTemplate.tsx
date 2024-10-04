@@ -51,7 +51,7 @@
           formData.append("file", file); // Append the file to FormData
 
           try {
-            await axios.post(POST_QUESTION_BANK(unitCode, projectName),
+            await axios.post(POST_QUESTION_BANK(unitCode, decodeURIComponent(projectName)),
               formData,
               {
                 headers: {
@@ -67,7 +67,7 @@
 
           // Confirm upload with GET request
           try {
-            const response = await axios.get(GET_QUESTION_BANK(unitCode, projectName)
+            const response = await axios.get(GET_QUESTION_BANK(unitCode, decodeURIComponent(projectName))
             );
             console.log("Confirmation response:", response.data);
           } catch (getError) {
@@ -123,7 +123,7 @@
       };
 
       try {
-        const response = await axios.post(POST_QUESTION_TEMPLATE(unitCode, projectName),
+        const response = await axios.post(POST_QUESTION_TEMPLATE(unitCode, decodeURIComponent(projectName)),
           data
         );
         console.log("Response:", response.data);

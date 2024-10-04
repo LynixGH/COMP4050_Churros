@@ -1,12 +1,17 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
-import UnitDashboard from '../page';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import QuestionTemplate from "@/app/components/QuestionTemplate"; // Import the new component
+import UnitDashboard from "../page";
+import Link from "next/link";
+import { Router } from "next/router";
 
-export default function AssignmentDashboard({ params }: { params: { unitDashboard: string; assignmentDashboard: string } }) {
-  
+export default function AssignmentDashboard({
+  params,
+}: {
+  params: { unitDashboard: string; assignmentDashboard: string };
+}) {
   const unitCode = params.unitDashboard;
   const projectName = params.assignmentDashboard;
   const [unitName, setUnitName] = useState<string>(unitCode); // Use unit code from params
@@ -25,7 +30,9 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`); // Use dynamic URL
+      const response = await axios.get(
+        `http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`
+      ); // Use dynamic URL
       setSubmissions(response.data.submission_files);
     } catch (err) {
       console.error("Error fetching submissions", err);
@@ -46,18 +53,22 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
       const formData = new FormData();
       // Append multiple files to formData
       Array.from(selectedFiles).forEach((file) => {
-        formData.append('files[]', file);
+        formData.append("files[]", file);
       });
 
       // Add any other data required (like staff_email if needed)
-      formData.append('staff_email', 'ta1@example.com');
+      formData.append("staff_email", "ta1@example.com");
 
       try {
-        await axios.post(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axios.post(
+          `http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         setSelectedFiles(null);
         fetchSubmissions();
       } catch (err) {
@@ -70,9 +81,9 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
   };
 
   const handleCheckboxChange = (submissionId: number) => {
-    setSelectedSubmissions(prev => 
-      prev.includes(submissionId) 
-        ? prev.filter(id => id !== submissionId) 
+    setSelectedSubmissions((prev) =>
+      prev.includes(submissionId)
+        ? prev.filter((id) => id !== submissionId)
         : [...prev, submissionId]
     );
   };
@@ -80,9 +91,14 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
   const handleGenerateQuestions = async () => {
     if (selectedSubmissions.length > 0) {
       try {
-        const response = await axios.post(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/generate-questions`, {
-          submission_ids: selectedSubmissions,
-        });
+        const response = await axios.post(
+          `http://13.211.162.133/units/${unitCode}/projects/${decodeURIComponent(
+            projectName
+          )}/generate_questions`,
+          {
+            submission_ids: selectedSubmissions,
+          }
+        );
         console.log("Questions generated successfully:", response.data);
       } catch (err) {
         console.error("Error generating questions", err);
@@ -102,7 +118,6 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
     <div className="p-4">
       <h1 className="text-2xl font-bold">{unitName} Dashboard</h1>
       <h2 className="text-xl mb-4">{assignmentName}</h2>
-
       {submissions.length === 0 ? (
         <div className="mb-4">
           <input
@@ -112,36 +127,38 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
             onChange={handleFileChange}
             className="border rounded px-2 py-1 mr-2"
           />
-          <button onClick={handleUpload} className="bg-green-500 text-white px-4 py-2 rounded" disabled={loading}>
-            {loading ? 'Uploading...' : 'Upload Submission'}
+          <button
+            onClick={handleUpload}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+            disabled={loading}
+          >
+            {loading ? "Uploading..." : "Upload Submission"}
           </button>
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>
       ) : null}
-
       <div className="flex justify-between items-center mt-4">
         <h3 className="text-lg font-semibold">Submissions</h3>
         <div>
-          <button 
+          <button
             onClick={() => {
               setShowTemplate(true);
               if (!templateSaved) {
                 setTemplateSaved(true); // Set template saved to true when opening for the first time
               }
-            }} 
+            }}
             className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
           >
-            {templateSaved ? 'Edit Question Template' : 'Add Question Template'}
+            {templateSaved ? "Edit Question Template" : "Add Question Template"}
           </button>
           <button
-            onClick={handleGenerateQuestions} 
+            onClick={handleGenerateQuestions}
             className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
           >
             Generate Questions
           </button>
         </div>
       </div>
-
       {submissions.length === 0 ? (
         <p>No submissions uploaded yet.</p>
       ) : (
@@ -156,7 +173,11 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
                       if (selectedSubmissions.length === submissions.length) {
                         setSelectedSubmissions([]);
                       } else {
-                        setSelectedSubmissions(submissions.map(submission => submission.submission_id));
+                        setSelectedSubmissions(
+                          submissions.map(
+                            (submission) => submission.submission_id
+                          )
+                        );
                       }
                     }}
                     checked={selectedSubmissions.length === submissions.length}
@@ -173,25 +194,44 @@ export default function AssignmentDashboard({ params }: { params: { unitDashboar
                   <td className="border px-4 py-2 text-center">
                     <input
                       type="checkbox"
-                      checked={selectedSubmissions.includes(submission.submission_id)}
-                      onChange={() => handleCheckboxChange(submission.submission_id)}
+                      checked={selectedSubmissions.includes(
+                        submission.submission_id
+                      )}
+                      onChange={() =>
+                        handleCheckboxChange(submission.submission_id)
+                      }
                     />
                   </td>
-                  <td className="border px-4 py-2">{submission.submission_id}</td>
-                  <td className="border px-4 py-2">{submission.submission_file_name}</td>
-                  <td className="border px-4 py-2">{submission.submission_status}</td>
+                  <td className="border px-4 py-2">
+                    {submission.submission_id}
+                  </td>
+                  <td className="border px-4 py-2">
+                    <Link
+                      href={
+                        `/dashboard/userDashboard/${unitCode}/${projectName}/${submission.submission_id}`
+                      }
+                    >{submission.submission_file_name}</Link>
+                  </td>
+                  <td className="border px-4 py-2">
+                    {submission.submission_status}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-
-      {showTemplate && <QuestionTemplate onClose={() => {
-        setShowTemplate(false);
-        resetTemplateSaved(); // Reset the template saved state when closing
-      }} unitCode={unitCode}
-      projectName={projectName}/>} {/* Render the overlay */}
+      {showTemplate && (
+        <QuestionTemplate
+          onClose={() => {
+            setShowTemplate(false);
+            resetTemplateSaved(); // Reset the template saved state when closing
+          }}
+          unitCode={unitCode}
+          projectName={projectName}
+        />
+      )}{" "}
+      {/* Render the overlay */}
     </div>
   );
-};
+}
