@@ -3,14 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import QuestionTemplate from '@/app/components/QuestionTemplate'; // Import the new component
+import UnitDashboard from '../page';
 
-export default function AssignmentDashboard({ params }: { params: { unitCode: string; projectName: string } }) {
-  // Destructure the parameters
-  const { unitCode, projectName } = params; // Assuming params contains unitCode and projectName
+export default function AssignmentDashboard({ params }: { params: { unitDashboard: string; assignmentDashboard: string } }) {
+  
+  const unitCode = params.unitDashboard;
+  const projectName = params.assignmentDashboard;
   const [unitName, setUnitName] = useState<string>(unitCode); // Use unit code from params
   const [assignmentName, setAssignmentName] = useState<string>(projectName); // Use project name from params
   const [submissions, setSubmissions] = useState<any[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null); // For multiple file selection
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
@@ -20,7 +22,6 @@ export default function AssignmentDashboard({ params }: { params: { unitCode: st
   useEffect(() => {
     fetchSubmissions();
   }, [unitCode, projectName]); // Dependency array updated
-
 
   const fetchSubmissions = async () => {
     try {
@@ -34,16 +35,22 @@ export default function AssignmentDashboard({ params }: { params: { unitCode: st
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      setSelectedFiles(event.target.files); // Allow multiple files selection
       setError(null);
     }
   };
 
   const handleUpload = async () => {
-    if (selectedFile) {
+    if (selectedFiles && selectedFiles.length > 0) {
       setLoading(true);
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      // Append multiple files to formData
+      Array.from(selectedFiles).forEach((file) => {
+        formData.append('files[]', file);
+      });
+
+      // Add any other data required (like staff_email if needed)
+      formData.append('staff_email', 'ta1@example.com');
 
       try {
         await axios.post(`http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`, formData, {
@@ -51,11 +58,11 @@ export default function AssignmentDashboard({ params }: { params: { unitCode: st
             'Content-Type': 'multipart/form-data',
           },
         });
-        setSelectedFile(null);
+        setSelectedFiles(null);
         fetchSubmissions();
       } catch (err) {
-        console.error("Error uploading file", err);
-        setError("Failed to upload file.");
+        console.error("Error uploading files", err);
+        setError("Failed to upload files.");
       } finally {
         setLoading(false);
       }
@@ -100,7 +107,8 @@ export default function AssignmentDashboard({ params }: { params: { unitCode: st
         <div className="mb-4">
           <input
             type="file"
-            accept=".zip"
+            accept=".pdf"
+            multiple // Allow multiple file selection
             onChange={handleFileChange}
             className="border rounded px-2 py-1 mr-2"
           />
@@ -182,7 +190,8 @@ export default function AssignmentDashboard({ params }: { params: { unitCode: st
       {showTemplate && <QuestionTemplate onClose={() => {
         setShowTemplate(false);
         resetTemplateSaved(); // Reset the template saved state when closing
-      }} />} {/* Render the overlay */}
+      }} unitCode={unitCode}
+      projectName={projectName}/>} {/* Render the overlay */}
     </div>
   );
 };
