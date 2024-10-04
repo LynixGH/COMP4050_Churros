@@ -122,6 +122,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     fetchData();
   }, [submissionId]);
 
+  // Active Question Select
   const handleEditClick = (
     type: "ai" | "static" | "random",
     questionKey: string,
