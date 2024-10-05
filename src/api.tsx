@@ -1,5 +1,5 @@
 //Define the base URL for API
-export const BASE_URL = 'http://13.211.162.133';
+export const BASE_URL = 'http://3.25.103.58';
 
 //Endpoints
 

@@ -199,7 +199,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   // Task 2: Handle Regen All
   const handleRegenAll = async () => {
     try {
-      const BASE_URL = "http://13.211.162.133";
+      const BASE_URL = "http://3.25.103.58";
 
       await axios.post(
         `${BASE_URL}/units/${encodeURIComponent(
@@ -209,7 +209,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       // Fetch the updated data after regeneration
       setLoading(true);
-      const response = await axios.get(`http://13.211.162.133/questions/11`);
+      const response = await axios.get(`http://3.25.103.58/questions/11`);
 
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;

@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import QuestionTemplate from "@/app/components/QuestionTemplate"; // Import the new component
-import UnitDashboard from "../page";
 import Link from "next/link";
-import { Router } from "next/router";
+import {  } from '@/api';
 
 export default function AssignmentDashboard({
   params,
@@ -31,7 +30,7 @@ export default function AssignmentDashboard({
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get(
-        `http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`
+        `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`
       ); // Use dynamic URL
       setSubmissions(response.data.submission_files);
     } catch (err) {
@@ -61,7 +60,7 @@ export default function AssignmentDashboard({
 
       try {
         await axios.post(
-          `http://13.211.162.133/units/${unitCode}/projects/${projectName}/files`,
+          `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`,
           formData,
           {
             headers: {
@@ -92,7 +91,7 @@ export default function AssignmentDashboard({
     if (selectedSubmissions.length > 0) {
       try {
         const response = await axios.post(
-          `http://13.211.162.133/units/${unitCode}/projects/${decodeURIComponent(
+          `http://3.25.103.58/units/${unitCode}/projects/${decodeURIComponent(
             projectName
           )}/generate_questions`,
           {
