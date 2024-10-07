@@ -4,18 +4,22 @@ import '@/app/styles/EditRubricPopup.css'; // Create a CSS file specific to Edit
 import { UPDATE_RUBRIC } from '@/api';
 
 const EditRubricPopup = ({ onClose, existingRubric }) => {
+  // Ensure rubric_id is explicitly initialized from existingRubric
   const [rubric, setRubric] = useState({
-    ...existingRubric,
+    rubric_id: existingRubric?.rubric_id || null,  // Ensure rubric_id is present
+    rubric_title: existingRubric?.rubric_title || '',
     ulo_list: existingRubric?.ulo_list || [],  // Ensure ulo_list is initialized
     grade_descriptors: existingRubric?.grade_descriptors || {}, // Ensure grade_descriptors is initialized
   });
 
   useEffect(() => {
     if (existingRubric) {
+      console.log('Existing rubric in edit popup:', existingRubric); // Log to verify rubric_id presence
       setRubric({
-        ...existingRubric,
-        ulo_list: existingRubric?.ulo_list || [],  // Ensure ulo_list is initialized
-        grade_descriptors: existingRubric?.grade_descriptors || {}, // Ensure grade_descriptors is initialized
+        rubric_id: existingRubric?.rubric_id || null,  // Explicitly set rubric_id again
+        rubric_title: existingRubric?.rubric_title || '',
+        ulo_list: existingRubric?.ulo_list || [],
+        grade_descriptors: existingRubric?.grade_descriptors || {},
       });
     }
   }, [existingRubric]);
@@ -77,11 +81,17 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
   // Submit updated rubric using PUT request
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (!rubric.rubric_id) {
+      console.error('rubric_id is missing');  // Log error if missing
+      return;
+    }
+  
     try {
-      const response = await axios.put(UPDATE_RUBRIC(7), rubric);
+      const response = await axios.put(UPDATE_RUBRIC(rubric.rubric_id), rubric);
       if (response.status === 200) {
         alert('Rubric updated successfully!');
-        onClose(rubric); // Pass updated rubric back to parent component after successful update
+        onClose(rubric);  // Pass updated rubric back to parent component after successful update
       }
     } catch (error) {
       console.error('Error updating rubric:', error);
@@ -105,7 +115,6 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
           />
 
           <h3>Unit Learning Outcomes (ULOs)</h3>
-          {/* Add a check for ulo_list to ensure it is defined and is an array */}
           {rubric.ulo_list && rubric.ulo_list.length > 0 ? (
             rubric.ulo_list.map((ulo, index) => (
               <div key={index} className="dynamic-list-item">
