@@ -7,6 +7,7 @@ import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creat
 import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
 import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC } from '@/api'; // Assume DELETE_RUBRIC is the correct API function
 
+
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
