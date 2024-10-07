@@ -36,6 +36,7 @@ export const GENERATE_RUBRIC = `${BASE_URL}/generate_rubric`;
 export const GET_RUBRIC = (rubricId: number) => `${BASE_URL}/rubric/${encodeURIComponent(rubricId)}`; 
 export const UPDATE_RUBRIC = (rubricId: number) => `${BASE_URL}/rubric/${encodeURIComponent(rubricId)}`;
 export const GET_ALL_RUBRICS = (staffEmail: string) => `${BASE_URL}/rubrics?staff_email=${encodeURIComponent(staffEmail)}`;
+export const DEL_RUBRIC = (rubricId: number) => `${BASE_URL}/rubric/${encodeURIComponent(rubricId)}`;
 
 // Marking Guide Conversion
 export const CONVERT_MARKING_GUIDE = ( marking_guide_Id : number ) => `${BASE_URL}/convert_marking_guide/${encodeURIComponent(marking_guide_Id)}`

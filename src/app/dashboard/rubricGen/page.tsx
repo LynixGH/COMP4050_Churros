@@ -5,7 +5,7 @@ import axios from 'axios';
 import '@/app/styles/rubricGen.css';
 import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
 import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
-import { GET_RUBRIC, GET_ALL_RUBRICS } from '@/api';
+import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC } from '@/api'; // Assume DELETE_RUBRIC is the correct API function
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
@@ -48,14 +48,26 @@ const RubricGen = () => {
   };
 
   // Delete rubric functionality
-  const handleDeleteRubric = (rubricId) => {
-    setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId));
-    
-    setDetailedRubrics((prevDetailedRubrics) => {
-      const newDetailedRubrics = { ...prevDetailedRubrics };
-      delete newDetailedRubrics[rubricId]; // Remove deleted rubric from detailed view
-      return newDetailedRubrics;
-    });
+  const handleDeleteRubric = async (rubricId) => {
+    try {
+      const response = await axios.delete(DEL_RUBRIC(rubricId));  // Send DELETE request to backend
+      if (response.status === 200) {
+        alert('Rubric deleted successfully!');
+        setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId)); // Remove deleted rubric from list
+
+        setDetailedRubrics((prevDetailedRubrics) => {
+          const newDetailedRubrics = { ...prevDetailedRubrics };
+          delete newDetailedRubrics[rubricId]; // Remove deleted rubric from detailed view
+          return newDetailedRubrics;
+        });
+      } else {
+        console.error('Failed to delete rubric');
+        alert('Failed to delete rubric.');
+      }
+    } catch (error) {
+      console.error('Error deleting rubric:', error);
+      alert('An error occurred while trying to delete the rubric. Please try again.');
+    }
   };
 
   // Fetch all rubrics from the API
