@@ -5,7 +5,7 @@ import axios from 'axios';
 import '@/app/styles/rubricGen.css';
 import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
 import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
-import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC } from '@/api'; // Assume DELETE_RUBRIC is the correct API function
+import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC } from '@/api';
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
@@ -20,13 +20,17 @@ const RubricGen = () => {
   };
 
   const handleOpenEditPopup = (rubric) => {
-    if (rubric?.rubric_id) {
-      console.log('Opening edit popup for rubric:', rubric);  // Log rubric object to ensure rubric_id is present
-      setEditRubric(rubric);  // Pass rubric to the edit popup, ensuring rubric_id exists
-      setIsEditPopupOpen(true);
-    } else {
-      console.error('rubric_id is missing when opening edit popup.');
+    // Log the entire rubric object to inspect it before opening the edit popup
+    console.log('Opening edit popup for rubric:', rubric);
+  
+    // Check if the rubric_id is present in the rubric object
+    if (!rubric?.rubric_id) {
+      console.error('rubric_id is missing in the rubric object:', rubric);
+      return;  // Stop here if rubric_id is missing
     }
+  
+    setEditRubric(rubric);  // Set the rubric object for editing
+    setIsEditPopupOpen(true);  // Open the edit popup
   };
 
   const handleCloseCreatePopup = (newRubric) => {
@@ -50,23 +54,28 @@ const RubricGen = () => {
   // Delete rubric functionality
   const handleDeleteRubric = async (rubricId) => {
     try {
-      const response = await axios.delete(DEL_RUBRIC(rubricId));  // Send DELETE request to backend
+      // Make DELETE request to the backend
+      const response = await axios.delete(DEL_RUBRIC(rubricId));
+  
       if (response.status === 200) {
-        alert('Rubric deleted successfully!');
-        setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId)); // Remove deleted rubric from list
-
+        console.log(`Rubric with ID: ${rubricId} successfully deleted.`);
+        
+        // Update the frontend by removing the deleted rubric
+        setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId));
+        
+        // Also remove it from the detailed rubrics view
         setDetailedRubrics((prevDetailedRubrics) => {
           const newDetailedRubrics = { ...prevDetailedRubrics };
           delete newDetailedRubrics[rubricId]; // Remove deleted rubric from detailed view
           return newDetailedRubrics;
         });
       } else {
-        console.error('Failed to delete rubric');
-        alert('Failed to delete rubric.');
+        console.error(`Failed to delete rubric with ID: ${rubricId}`);
+        alert('Failed to delete rubric. Please try again.');
       }
     } catch (error) {
-      console.error('Error deleting rubric:', error);
-      alert('An error occurred while trying to delete the rubric. Please try again.');
+      console.error(`Error deleting rubric with ID: ${rubricId}`, error);
+      alert('Error deleting rubric. Please try again.');
     }
   };
 
@@ -89,39 +98,70 @@ const RubricGen = () => {
   // Fetch detailed rubric data when the user clicks to expand it
   const fetchRubricDetails = async (rubricId) => {
     if (expandedRubricId === rubricId) {
-      // If the rubric is already expanded, collapse it
-      setExpandedRubricId(null);
+      setExpandedRubricId(null);  // If already expanded, hide the details
       return;
     }
-
-    try {
-      const response = await axios.get(GET_RUBRIC(rubricId));
-      console.log('Fetched rubric details:', response.data);  // Ensure rubric details are fetched
-      
-      // Add rubric_id to the detailed rubric object
-      const detailedRubricWithId = { ...response.data, rubric_id: rubricId };
-
-      setDetailedRubrics((prevDetailedRubrics) => ({
-        ...prevDetailedRubrics,
-        [rubricId]: detailedRubricWithId, // Store the detailed rubric with its ID
-      }));
-      setExpandedRubricId(rubricId);  // Set the expanded rubric to the fetched one
-    } catch (error) {
-      console.error(`Error fetching rubric ${rubricId} details:`, error);
-      alert(`Failed to fetch rubric details for rubric ID: ${rubricId}`);
+  
+    if (!detailedRubrics[rubricId]) {
+      try {
+        const response = await axios.get(GET_RUBRIC(rubricId));
+        console.log('Fetched rubric details:', response.data);  // Log the entire fetched rubric details
+  
+        setDetailedRubrics((prevDetailedRubrics) => ({
+          ...prevDetailedRubrics,
+          [rubricId]: { ...response.data, rubric_id: rubricId },  // Ensure rubric_id is included in the detailed object
+        }));
+      } catch (error) {
+        console.error(`Error fetching rubric ${rubricId} details:`, error);
+        alert(`Failed to fetch rubric details for rubric ID: ${rubricId}`);
+      }
     }
+  
+    setExpandedRubricId(rubricId);  // Expand the selected rubric
   };
 
-  // Helper function to render criteria
-  const renderCriteria = (criteria) => (
-    <ul>
-      {criteria.map((criterion, index) => (
-        <li key={index}>
-          <strong>{criterion.criteria_name}:</strong> {criterion.criteria_description}
-        </li>
-      ))}
-    </ul>
-  );
+  // Helper function to render the rubric table based on the criteria and grade descriptions
+  const renderRubricTable = (rubricData) => {
+    if (!rubricData || !rubricData.grade_descriptors) {
+      return <p>No rubric data available</p>;
+    }
+
+    // Define the custom order for grades
+    const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
+
+    // Filter out any missing grades in case the API doesn't provide all grades
+    const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
+    
+    // Get the criteria from the first grade that exists
+    const criteria = rubricData.grade_descriptors[grades[0]].criterion;
+
+    return (
+      <table className="rubric-table">
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            {grades.map((grade) => (
+              <th key={grade}>{grade.replace('_', ' ').toUpperCase()}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {criteria.map((criterion, index) => (
+            <tr key={index}>
+              {/* Display criterion name */}
+              <td>{criterion.criteria_name}</td>
+              {/* Display descriptions for each grade */}
+              {grades.map((grade) => (
+                <td key={grade}>
+                  {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
 
   return (
     <div className="rubric-dashboard">
@@ -148,29 +188,11 @@ const RubricGen = () => {
             {expandedRubricId === rubric.rubric_id && detailedRubrics[rubric.rubric_id] && (
               <div className="rubric-table-container">
                 <h2>{detailedRubrics[rubric.rubric_id]?.rubric_title}</h2>
-                <table className="rubric-table">
-                  <thead>
-                    <tr>
-                      <th>Grade</th>
-                      <th>Mark Range</th>
-                      <th>Criteria</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(detailedRubrics[rubric.rubric_id]?.grade_descriptors).map(
-                      ([grade, descriptor], idx) => (
-                        <tr key={idx}>
-                          <td>{grade}</td>
-                          <td>{descriptor.mark_min} - {descriptor.mark_max}</td>
-                          <td>{renderCriteria(descriptor.criterion)}</td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
+                {/* Render rubric table */}
+                {renderRubricTable(detailedRubrics[rubric.rubric_id])}
                 <button onClick={() => handleOpenEditPopup(detailedRubrics[rubric.rubric_id])}>
-                  Edit Rubric
-                </button>
+  Edit Rubric
+</button>
                 <button onClick={() => handleDeleteRubric(rubric.rubric_id)}>Delete Rubric</button>
               </div>
             )}

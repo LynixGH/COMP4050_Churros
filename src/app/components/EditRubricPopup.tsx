@@ -88,7 +88,7 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
     }
   
     try {
-      const response = await axios.put(UPDATE_RUBRIC(rubric.rubric_id), rubric);
+      const response = await axios.put(UPDATE_RUBRIC(rubric.rubric_id), rubric);  // Use the rubric_id dynamically
       if (response.status === 200) {
         alert('Rubric updated successfully!');
         onClose(rubric);  // Pass updated rubric back to parent component after successful update
