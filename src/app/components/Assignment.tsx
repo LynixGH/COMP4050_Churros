@@ -34,7 +34,6 @@ const Assignments: React.FC<Assignment> = ({
         } else {
           setError("Unit not found");
           setLoading(false);
-          window.location.href = "/";
         }
       })
       .catch((err) => {
@@ -110,8 +109,6 @@ const Assignments: React.FC<Assignment> = ({
   if (error) {
     return <p>{error}</p>;
   }
-
-  // patth/path2?unitid=23423&
 
   return (
     <div style={styles.container}>
