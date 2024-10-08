@@ -113,7 +113,8 @@ const Assignments: React.FC<Assignment> = ({
   return (
     <div style={styles.container}>
       {assignments.map((assignment) => (
-        <Link
+        <Link 
+        key={assignment.project_id}
           href={`/dashboard/userDashboard/${unit_code}/${assignment.project_name}`}
         >
           <div key={assignment.project_id} style={styles.box}>
