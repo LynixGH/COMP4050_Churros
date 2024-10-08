@@ -225,7 +225,7 @@ const QuestionTemplate: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           </div>
         </div>
-                       {/* Number of Random Questions */}
+       {/* Number of Random Questions */}
          <div className="mb-6 relative">
           <div className="relative border rounded px-2 py-1 w-full focus-within:ring-2 focus-within:ring-blue-500">
             <input
