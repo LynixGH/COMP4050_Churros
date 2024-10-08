@@ -109,9 +109,10 @@
       // Prepare the data to be sent
       const data = {
         static_questions: questions.filter((q) => q.trim() !== ""), // Filter out empty questions
-        static_questions_count: questions.length,
-        question_bank_count: questionBank.length,
-        ai_questions_count: randomQuestionsCount
+        // static_questions_count: questions.length,
+        // question_bank_count: questionBank.length,
+        // random_questions_count: randomQuestionsCount
+        question_bank_count: randomQuestionsCount
           ? parseInt(randomQuestionsCount)
           : 0,
         factual_recall_count: parseInt(numQuestions.type1) || 0,

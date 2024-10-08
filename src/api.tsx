@@ -57,7 +57,7 @@ export const GET_ALL_TA = (unitCode: string) => `${BASE_URL}/units/${encodeURICo
 export const GET_ALL_STAFF = `${BASE_URL}/staffs`;
 
 //Submissions
-export const BATCH_UPLOAD_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/files`;  
-export const GET_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/files`;  
-export const DELETE_ALL_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/files`;  
-export const DELETE_SUBMISSION = (unitCode: string, projectName: string, submissionId : number) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/files/${encodeURIComponent(submissionId)}`;  
+export const BATCH_UPLOAD_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}/files`;  
+export const GET_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}/files`;  
+export const DELETE_ALL_SUBMISSIONS = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}/files`;  
+export const DELETE_SUBMISSION = (unitCode: string, projectName: string, submissionId : number) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}/files/${encodeURIComponent(submissionId)}`;  
