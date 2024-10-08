@@ -44,7 +44,8 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
   useEffect(() => {
     if (existingRubric) {
       setRubric({
-        ...existingRubric,
+        staff_email: existingRubric.staff_email || '', // Ensure it's always a string
+        assessment_description: existingRubric.assessment_description || '', // Ensure it's always a string
         criteria: existingRubric.criteria || [
           {
             criterion: '',
@@ -58,6 +59,7 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
       });
     }
   }, [existingRubric]);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
