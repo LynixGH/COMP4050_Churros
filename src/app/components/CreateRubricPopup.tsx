@@ -5,7 +5,27 @@ import axios from 'axios';
 import '@/app/styles/CreateRubricPopup.css';
 import { GENERATE_RUBRIC } from '@/api';
 
-const CreateRubricPopup = ({ onClose, existingRubric }) => {
+// Define an interface for the props
+interface CreateRubricPopupProps {
+  onClose: () => void; // Define onClose as a function with no arguments
+  existingRubric?: {
+    staff_email?: string;
+    assessment_description?: string;
+    criteria?: {
+      criterion: string;
+      keywords: string[];
+      competencies: string[];
+      skills: string[];
+      knowledge: string[];
+    }[];
+    ulos?: string[];
+  };
+}
+
+const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
+  onClose,
+  existingRubric,
+}) => {
   const [rubric, setRubric] = useState({
     staff_email: '',
     assessment_description: '',
@@ -39,7 +59,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }
   }, [existingRubric]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -63,7 +83,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  const removeCriterion = (index) => {
+  const removeCriterion = (index: number) => {
     setRubric((prevRubric) => ({
       ...prevRubric,
       criteria: prevRubric.criteria.filter((_, i) => i !== index),
@@ -77,7 +97,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  const addFieldToCriterion = (index, field) => {
+  const addFieldToCriterion = (index: number, field: keyof typeof rubric.criteria[0]) => {
     const updatedCriteria = [...rubric.criteria];
     updatedCriteria[index] = {
       ...updatedCriteria[index],
@@ -89,7 +109,7 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  const removeFieldFromCriterion = (index, field, fieldIndex) => {
+  const removeFieldFromCriterion = (index: number, field: keyof typeof rubric.criteria[0], fieldIndex: number) => {
     const updatedCriteria = [...rubric.criteria];
     updatedCriteria[index][field] = updatedCriteria[index][field].filter(
       (_, i) => i !== fieldIndex
@@ -100,19 +120,19 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  const removeULO = (uloIndex) => {
+  const removeULO = (uloIndex: number) => {
     setRubric((prevRubric) => ({
       ...prevRubric,
       ulos: prevRubric.ulos.filter((_, index) => index !== uloIndex),
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await axios.post(GENERATE_RUBRIC, rubric);
       if (response.status === 200) {
-       console.log('Rubric submitted successfully!');
+        console.log('Rubric submitted successfully!');
         onClose(); // Close the form after submission
       }
     } catch (error) {
@@ -309,8 +329,8 @@ const CreateRubricPopup = ({ onClose, existingRubric }) => {
           </button>
 
           <button type="submit">Submit</button>
-          <button type="button" onClick={() => onClose(null)}>
-              Cancel
+          <button type="button" onClick={() => onClose()}>
+            Cancel
           </button>
         </form>
       </div>
