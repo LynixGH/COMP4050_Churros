@@ -5,7 +5,7 @@ import axios from 'axios';
 import '@/app/styles/rubricGen.css';
 import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
 import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
-import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC } from '@/api';
+import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC, GET_PDF_RUBRIC, GET_XLS_RUBRIC } from '@/api';
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
@@ -20,17 +20,9 @@ const RubricGen = () => {
   };
 
   const handleOpenEditPopup = (rubric) => {
-    // Log the entire rubric object to inspect it before opening the edit popup
     console.log('Opening edit popup for rubric:', rubric);
-  
-    // Check if the rubric_id is present in the rubric object
-    if (!rubric?.rubric_id) {
-      console.error('rubric_id is missing in the rubric object:', rubric);
-      return;  // Stop here if rubric_id is missing
-    }
-  
-    setEditRubric(rubric);  // Set the rubric object for editing
-    setIsEditPopupOpen(true);  // Open the edit popup
+    setEditRubric(rubric);
+    setIsEditPopupOpen(true);
   };
 
   const handleCloseCreatePopup = (newRubric) => {
@@ -54,19 +46,14 @@ const RubricGen = () => {
   // Delete rubric functionality
   const handleDeleteRubric = async (rubricId) => {
     try {
-      // Make DELETE request to the backend
       const response = await axios.delete(DEL_RUBRIC(rubricId));
   
       if (response.status === 200) {
         console.log(`Rubric with ID: ${rubricId} successfully deleted.`);
-        
-        // Update the frontend by removing the deleted rubric
         setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId));
-        
-        // Also remove it from the detailed rubrics view
         setDetailedRubrics((prevDetailedRubrics) => {
           const newDetailedRubrics = { ...prevDetailedRubrics };
-          delete newDetailedRubrics[rubricId]; // Remove deleted rubric from detailed view
+          delete newDetailedRubrics[rubricId];
           return newDetailedRubrics;
         });
       } else {
@@ -93,23 +80,22 @@ const RubricGen = () => {
     };
 
     fetchAllRubrics();
-  }, []); // Fetch data once when component mounts
+  }, []);
 
   // Fetch detailed rubric data when the user clicks to expand it
   const fetchRubricDetails = async (rubricId) => {
     if (expandedRubricId === rubricId) {
-      setExpandedRubricId(null);  // If already expanded, hide the details
+      setExpandedRubricId(null);
       return;
     }
   
     if (!detailedRubrics[rubricId]) {
       try {
         const response = await axios.get(GET_RUBRIC(rubricId));
-        console.log('Fetched rubric details:', response.data);  // Log the entire fetched rubric details
-  
+        console.log('Fetched rubric details:', response.data);
         setDetailedRubrics((prevDetailedRubrics) => ({
           ...prevDetailedRubrics,
-          [rubricId]: { ...response.data, rubric_id: rubricId },  // Ensure rubric_id is included in the detailed object
+          [rubricId]: { ...response.data, rubric_id: rubricId },
         }));
       } catch (error) {
         console.error(`Error fetching rubric ${rubricId} details:`, error);
@@ -117,7 +103,7 @@ const RubricGen = () => {
       }
     }
   
-    setExpandedRubricId(rubricId);  // Expand the selected rubric
+    setExpandedRubricId(rubricId);
   };
 
   // Helper function to render the rubric table based on the criteria and grade descriptions
@@ -126,13 +112,8 @@ const RubricGen = () => {
       return <p>No rubric data available</p>;
     }
 
-    // Define the custom order for grades
     const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
-
-    // Filter out any missing grades in case the API doesn't provide all grades
     const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
-    
-    // Get the criteria from the first grade that exists
     const criteria = rubricData.grade_descriptors[grades[0]].criterion;
 
     return (
@@ -148,9 +129,7 @@ const RubricGen = () => {
         <tbody>
           {criteria.map((criterion, index) => (
             <tr key={index}>
-              {/* Display criterion name */}
               <td>{criterion.criteria_name}</td>
-              {/* Display descriptions for each grade */}
               {grades.map((grade) => (
                 <td key={grade}>
                   {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
@@ -163,6 +142,45 @@ const RubricGen = () => {
     );
   };
 
+  const handleExport = async (rubricId, format) => {
+    try {
+      let exportEndpoint;
+      
+      // Set the export endpoint based on the format
+      if (format === 'PDF') {
+        exportEndpoint = GET_PDF_RUBRIC(rubricId); // Future endpoint for PDF export
+      } else if (format === 'XLS') {
+        exportEndpoint = GET_XLS_RUBRIC(rubricId); // Future endpoint for XLS export
+      }
+  
+      // Make the GET request to fetch the export file
+      const response = await axios.get(exportEndpoint, {
+        responseType: 'blob', // Ensure the response is treated as a file (blob)
+      });
+  
+      // Create a URL for the blob and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+  
+      // Set filename for download based on format
+      link.setAttribute('download', `rubric_${rubricId}.${format.toLowerCase()}`);
+      
+      // Append link to the document and trigger the download
+      document.body.appendChild(link);
+      link.click();
+  
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+  
+    } catch (error) {
+      console.error(`Error exporting rubric ID ${rubricId} as ${format}`, error);
+      alert(`Failed to export rubric as ${format}. Please try again.`);
+    }
+  };
+  
+
   return (
     <div className="rubric-dashboard">
       <button onClick={handleOpenCreatePopup}>Create New Rubric</button>
@@ -173,7 +191,6 @@ const RubricGen = () => {
         <EditRubricPopup onClose={handleCloseEditPopup} existingRubric={editRubric} />
       )}
 
-      {/* Render list of rubrics */}
       {rubrics.length > 0 ? (
         rubrics.map((rubric) => (
           <div key={rubric.rubric_id} className="rubric-summary">
@@ -184,16 +201,17 @@ const RubricGen = () => {
               {expandedRubricId === rubric.rubric_id ? 'Hide Details' : 'View Details'}
             </button>
 
-            {/* Render detailed rubric if this is the expanded rubric */}
             {expandedRubricId === rubric.rubric_id && detailedRubrics[rubric.rubric_id] && (
               <div className="rubric-table-container">
                 <h2>{detailedRubrics[rubric.rubric_id]?.rubric_title}</h2>
-                {/* Render rubric table */}
                 {renderRubricTable(detailedRubrics[rubric.rubric_id])}
+
                 <button onClick={() => handleOpenEditPopup(detailedRubrics[rubric.rubric_id])}>
-  Edit Rubric
-</button>
+                  Edit Rubric
+                </button>
                 <button onClick={() => handleDeleteRubric(rubric.rubric_id)}>Delete Rubric</button>
+                <button onClick={() => handleExport(rubric.rubric_id, 'PDF')}>Export to PDF</button>
+                <button onClick={() => handleExport(rubric.rubric_id, 'XLS')}>Export to XLS</button>
               </div>
             )}
           </div>
