@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import QuestionTemplate from "@/app/components/QuestionTemplate"; // Import the new component
 import Link from "next/link";
-import {  } from '@/api';
+import { GET_SUBMISSIONS , BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS} from '@/api';
 
 export default function AssignmentDashboard({
   params,
@@ -30,7 +30,8 @@ export default function AssignmentDashboard({
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get(
-        `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`
+        // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`
+        GET_SUBMISSIONS(unitCode, projectName)
       ); // Use dynamic URL
       setSubmissions(response.data.submission_files);
     } catch (err) {
@@ -60,7 +61,8 @@ export default function AssignmentDashboard({
 
       try {
         await axios.post(
-          `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`,
+          // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`,
+          BATCH_UPLOAD_SUBMISSIONS(unitCode, projectName),
           formData,
           {
             headers: {
@@ -91,9 +93,8 @@ export default function AssignmentDashboard({
     if (selectedSubmissions.length > 0) {
       try {
         const response = await axios.post(
-          `http://3.25.103.58/units/${unitCode}/projects/${decodeURIComponent(
-            projectName
-          )}/generate_questions`,
+          // `http://3.25.103.58/units/${unitCode}/projects/${decodeURIComponent(projectName)}/generate_questions`,
+          GENERATE_ALL_QUESTIONS(unitCode, decodeURIComponent(projectName)),
           {
             submission_ids: selectedSubmissions,
           }
