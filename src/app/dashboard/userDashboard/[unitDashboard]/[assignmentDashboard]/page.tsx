@@ -116,7 +116,7 @@ export default function AssignmentDashboard({
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">{unitName} Dashboard</h1>
-      <h2 className="text-xl mb-4">{assignmentName}</h2>
+      <h2 className="text-xl mb-4">{decodeURIComponent(assignmentName)}</h2>
       {submissions.length === 0 ? (
         <div className="mb-4">
           <input
