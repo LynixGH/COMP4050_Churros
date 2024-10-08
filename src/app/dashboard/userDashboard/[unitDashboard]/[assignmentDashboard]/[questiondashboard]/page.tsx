@@ -1,21 +1,22 @@
 // page.tsx
-import ReviewQuestions from '@/app/components/ReviewQuestions';
+import ReviewQuestions from "@/app/components/ReviewQuestions";
 
 interface PageProps {
   params: {
-    unitDashboard: string;
-    assignmentDashboard: string;
-    questionDashboard: string;
+    questiondashboard: number;
+    projectName: string;
+    unitCode: string;
   };
 }
 
 export default function Page({ params }: PageProps) {
-  const { unitDashboard, assignmentDashboard, questionDashboard } = params;
+  const { questiondashboard, projectName, unitCode } = params;
 
   return (
     <ReviewQuestions
-      unitCode={unitDashboard}
-      projectName={assignmentDashboard}
+      submissionId={questiondashboard}
+      projectName={projectName}
+      unitCode={unitCode}
     />
   );
 }

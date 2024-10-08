@@ -19,7 +19,7 @@ const menuItems = [
         },
         {
           icon: "/assignment.png",
-          label: "Assignments",
+          label: "Rubric",
           href: "/list/assignments",
           visible: ["admin", "teacher", "student", "parent"],
         },

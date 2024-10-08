@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, CSSProperties } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, CSSProperties } from "react";
+import axios from "axios";
+import { GET_GENERATED_QUESTIONS } from "@/api";
 
 interface AIQuestionCategory {
   [questionKey: string]: string;
@@ -25,63 +26,67 @@ interface ReviewData {
 }
 
 interface ReviewQuestionsProps {
-  unitCode: string;
+  submissionId: number;
   projectName: string;
+  unitCode: string;
 }
 
 const dummyData: ReviewData = {
   ai_questions: {
     analysis_and_evaluation: {
       question_1:
-        'Evaluate the importance of documentation in a project like yours that involves complex programming tasks. How will you ensure your documentation remains consistent and helpful?',
+        "DUMMY Evaluate the importance of documentation in a project like yours that involves complex programming tasks. How will you ensure your documentation remains consistent and helpful?",
       question_2:
-        'Analyze the decision to use C++ for developing your program. What are the advantages and disadvantages of using C++ for low-level graphics programming compared to other languages?',
+        "Analyze the decision to use C++ for developing your program. What are the advantages and disadvantages of using C++ for low-level graphics programming compared to other languages?",
       question_3:
-        'In your opinion, how does the complexity of the Vulkan API compare to other graphics libraries you are aware of? What challenges do you anticipate facing with Vulkan?',
+        "In your opinion, how does the complexity of the Vulkan API compare to other graphics libraries you are aware of? What challenges do you anticipate facing with Vulkan?",
     },
     application_and_problem_solving: {
       question_1:
-        'Given your understanding of graphics programming, how would you approach implementing a new shader effect that is not covered in the existing resources you plan to use?',
+        "Given your understanding of graphics programming, how would you approach implementing a new shader effect that is not covered in the existing resources you plan to use?",
     },
     factual_recall: {
       question_1:
-        'What is the primary purpose of learning the Vulkan graphics library and GLSL in the context of your project?',
+        "What is the primary purpose of learning the Vulkan graphics library and GLSL in the context of your project?",
       question_2:
-        'Can you explain the basic differences between Vulkan and OpenGL?',
+        "Can you explain the basic differences between Vulkan and OpenGL?",
       question_3:
-        'What are the main milestones outlined in your project, and what does each milestone aim to achieve?',
+        "What are the main milestones outlined in your project, and what does each milestone aim to achieve?",
     },
     open_ended: {
       question_1:
-        'Reflecting on your project, how do you envision the skills you develop through this project impacting your future career in game development or related fields?',
+        "Reflecting on your project, how do you envision the skills you develop through this project impacting your future career in game development or related fields?",
     },
   },
-  project_title: 'Project Himanshi',
+  project_title: "Project Himanshi",
   random_questions: [
-    { question: 'What inspired you to choose this project?' },
-    { question: 'How do you plan to test and validate your work?' },
-    { question: 'What potential obstacles do you foresee?' },
+    { question: "What inspired you to choose this project?" },
+    { question: "How do you plan to test and validate your work?" },
+    { question: "What potential obstacles do you foresee?" },
   ],
   static_questions: [
     "Describe your project's main objectives.",
-    'What technologies will you be using?',
+    "What technologies will you be using?",
   ],
   submission_id: 10,
-  unit_code: 'CS101',
+  unit_code: "CS101",
 };
 
 const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
-  unitCode,
+  submissionId,
   projectName,
+  unitCode,
 }) => {
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'static' | 'random' | 'ai'>('static');
+  const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
+    "static"
+  );
   const [editingQuestion, setEditingQuestion] = useState<{
     category?: string;
     questionKey: string;
     questionText: string;
-    type: 'ai' | 'static' | 'random';
+    type: "ai" | "static" | "random";
     index?: number;
   } | null>(null);
   const [selectedAIQuestions, setSelectedAIQuestions] = useState<{
@@ -91,21 +96,23 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const BASE_URL = 'http://13.211.162.133';
 
         const response = await axios.get(
-          `http://13.211.162.133/questions/11`
+          `${GET_GENERATED_QUESTIONS(submissionId)}`
         );
 
         if (response.status === 200 && response.data) {
           const data: ReviewData[] = response.data;
           setReviewData(data[0]);
         } else {
-          console.error('Data not found, using dummy data.');
+          console.error("Data not found, using dummy data.");
           setReviewData(dummyData);
         }
       } catch (err) {
-        console.error('Error fetching review questions, using dummy data.', err);
+        console.error(
+          "Error fetching review questions, using dummy data.",
+          err
+        );
         setReviewData(dummyData);
       } finally {
         setLoading(false);
@@ -113,10 +120,11 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     };
 
     fetchData();
-  }, [unitCode, projectName]);
+  }, [submissionId]);
 
+  // Active Question Select
   const handleEditClick = (
-    type: 'ai' | 'static' | 'random',
+    type: "ai" | "static" | "random",
     questionKey: string,
     questionText: string,
     category?: string,
@@ -138,18 +146,18 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     if (editingQuestion && reviewData) {
       const updatedReviewData = { ...reviewData };
 
-      if (editingQuestion.type === 'ai' && editingQuestion.category) {
+      if (editingQuestion.type === "ai" && editingQuestion.category) {
         updatedReviewData.ai_questions[editingQuestion.category][
           editingQuestion.questionKey
         ] = editingQuestion.questionText;
       } else if (
-        editingQuestion.type === 'static' &&
+        editingQuestion.type === "static" &&
         editingQuestion.index !== undefined
       ) {
         updatedReviewData.static_questions[editingQuestion.index] =
           editingQuestion.questionText;
       } else if (
-        editingQuestion.type === 'random' &&
+        editingQuestion.type === "random" &&
         editingQuestion.index !== undefined
       ) {
         updatedReviewData.random_questions[editingQuestion.index].question =
@@ -183,14 +191,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
   const isAIQuestionSelected = (category: string, questionKey: string) => {
     return (
-      selectedAIQuestions[category] && selectedAIQuestions[category][questionKey]
+      selectedAIQuestions[category] &&
+      selectedAIQuestions[category][questionKey]
     );
   };
 
   // Task 2: Handle Regen All
   const handleRegenAll = async () => {
     try {
-      const BASE_URL = 'http://13.211.162.133';
+      const BASE_URL = "http://3.25.103.58";
 
       await axios.post(
         `${BASE_URL}/units/${encodeURIComponent(
@@ -200,9 +209,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       // Fetch the updated data after regeneration
       setLoading(true);
-      const response = await axios.get(
-        `http://13.211.162.133/questions/11`
-      );
+      const response = await axios.get(`http://3.25.103.58/questions/11`);
 
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
@@ -210,10 +217,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
         // Clear selected AI questions after regeneration
         setSelectedAIQuestions({});
       } else {
-        console.error('Data not found after regeneration.');
+        console.error("Data not found after regeneration.");
       }
     } catch (err) {
-      console.error('Error regenerating questions:', err);
+      console.error("Error regenerating questions:", err);
     } finally {
       setLoading(false);
     }
@@ -234,20 +241,20 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       {/* Tab Navigation */}
       <div style={styles.tabContainer}>
         <button
-          style={activeTab === 'static' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('static')}
+          style={activeTab === "static" ? styles.activeTab : styles.tab}
+          onClick={() => setActiveTab("static")}
         >
           Static Questions
         </button>
         <button
-          style={activeTab === 'random' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('random')}
+          style={activeTab === "random" ? styles.activeTab : styles.tab}
+          onClick={() => setActiveTab("random")}
         >
           Random Questions
         </button>
         <button
-          style={activeTab === 'ai' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('ai')}
+          style={activeTab === "ai" ? styles.activeTab : styles.tab}
+          onClick={() => setActiveTab("ai")}
         >
           AI Questions
         </button>
@@ -255,7 +262,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       {/* Tab Content */}
       <div style={styles.tabContent}>
-        {activeTab === 'static' && (
+        {activeTab === "static" && (
           <>
             {reviewData.static_questions && (
               <table style={styles.table}>
@@ -264,13 +271,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                     <tr
                       key={index}
                       style={
-                        index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd
+                        index % 2 === 0
+                          ? styles.tableRowEven
+                          : styles.tableRowOdd
                       }
                     >
                       <td style={styles.questionText}>
                         {editingQuestion &&
-                        editingQuestion.type === 'static' &&
-                        editingQuestion.index === index ? (
+                          editingQuestion.type === "static" &&
+                          editingQuestion.index === index ? (
                           <input
                             type="text"
                             value={editingQuestion.questionText}
@@ -283,8 +292,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                       </td>
                       <td style={styles.actionCell}>
                         {editingQuestion &&
-                        editingQuestion.type === 'static' &&
-                        editingQuestion.index === index ? (
+                          editingQuestion.type === "static" &&
+                          editingQuestion.index === index ? (
                           <>
                             <button
                               style={styles.saveButton}
@@ -303,7 +312,13 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                           <button
                             style={styles.editButton}
                             onClick={() =>
-                              handleEditClick('static', '', question, undefined, index)
+                              handleEditClick(
+                                "static",
+                                "",
+                                question,
+                                undefined,
+                                index
+                              )
                             }
                           >
                             Edit
@@ -318,7 +333,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
           </>
         )}
 
-        {activeTab === 'random' && (
+        {activeTab === "random" && (
           <>
             {reviewData.random_questions && (
               <>
@@ -329,13 +344,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                       <tr
                         key={index}
                         style={
-                          index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd
+                          index % 2 === 0
+                            ? styles.tableRowEven
+                            : styles.tableRowOdd
                         }
                       >
                         <td style={styles.questionText}>
                           {editingQuestion &&
-                          editingQuestion.type === 'random' &&
-                          editingQuestion.index === index ? (
+                            editingQuestion.type === "random" &&
+                            editingQuestion.index === index ? (
                             <input
                               type="text"
                               value={editingQuestion.questionText}
@@ -348,8 +365,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                         </td>
                         <td style={styles.actionCell}>
                           {editingQuestion &&
-                          editingQuestion.type === 'random' &&
-                          editingQuestion.index === index ? (
+                            editingQuestion.type === "random" &&
+                            editingQuestion.index === index ? (
                             <>
                               <button
                                 style={styles.saveButton}
@@ -369,8 +386,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                               style={styles.editButton}
                               onClick={() =>
                                 handleEditClick(
-                                  'random',
-                                  '',
+                                  "random",
+                                  "",
                                   q.question,
                                   undefined,
                                   index
@@ -390,7 +407,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
           </>
         )}
 
-        {activeTab === 'ai' && (
+        {activeTab === "ai" && (
           <>
             <button style={styles.regenButton} onClick={handleRegenAll}>
               Regen All
@@ -406,7 +423,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                       <table style={styles.table}>
                         <tbody>
                           {Object.entries(questions).map(
-                            ([questionKey, questionText]: [string, string], index) => {
+                            (
+                              [questionKey, questionText]: [string, string],
+                              index
+                            ) => {
                               const isSelected = isAIQuestionSelected(
                                 category,
                                 questionKey
@@ -418,18 +438,22 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                     isSelected
                                       ? { ...styles.tableRowSelected }
                                       : index % 2 === 0
-                                      ? styles.tableRowEven
-                                      : styles.tableRowOdd
+                                        ? styles.tableRowEven
+                                        : styles.tableRowOdd
                                   }
                                   onClick={() =>
-                                    handleAIQuestionSelect(category, questionKey)
+                                    handleAIQuestionSelect(
+                                      category,
+                                      questionKey
+                                    )
                                   }
                                 >
                                   <td style={styles.questionText}>
                                     {editingQuestion &&
-                                    editingQuestion.type === 'ai' &&
-                                    editingQuestion.category === category &&
-                                    editingQuestion.questionKey === questionKey ? (
+                                      editingQuestion.type === "ai" &&
+                                      editingQuestion.category === category &&
+                                      editingQuestion.questionKey ===
+                                      questionKey ? (
                                       <input
                                         type="text"
                                         value={editingQuestion.questionText}
@@ -442,9 +466,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                   </td>
                                   <td style={styles.actionCell}>
                                     {editingQuestion &&
-                                    editingQuestion.type === 'ai' &&
-                                    editingQuestion.category === category &&
-                                    editingQuestion.questionKey === questionKey ? (
+                                      editingQuestion.type === "ai" &&
+                                      editingQuestion.category === category &&
+                                      editingQuestion.questionKey ===
+                                      questionKey ? (
                                       <>
                                         <button
                                           style={styles.saveButton}
@@ -465,7 +490,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                         onClick={(e) => {
                                           e.stopPropagation(); // Prevent row click
                                           handleEditClick(
-                                            'ai',
+                                            "ai",
                                             questionKey,
                                             questionText,
                                             category
@@ -497,9 +522,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 // Helper function to format category names
 const formatCategoryName = (category: string) => {
   return category
-    .split('_')
+    .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(" ");
 };
 
 // Inline styles for the component
