@@ -136,7 +136,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     try {
       // Send a POST request for selected AI questions regeneration
       for (let category of selectedCategories) {
-        const generateUrl = GENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId, category);
+        const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
         await axios.post(generateUrl);
       }
   
