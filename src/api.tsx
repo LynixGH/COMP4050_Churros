@@ -51,7 +51,8 @@ export const GET_STUDENTS_LIST = (unitCode: string) =>
 
 //TA
 export const POST_TA = (unitCode: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/collaborators`; 
-export const GET_ALL_TA = (unitCode: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/collaborators`; 
+export const GET_ALL_TA = (unitCode: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/collaborators`;
+export const DELETE_TA = (unitCode:string, staff_id :number) =>`${BASE_URL}/units/${encodeURIComponent(unitCode)}/collaborators/${encodeURIComponent(staff_id)}`
 
 //TA & Staff
 export const GET_ALL_STAFF = `${BASE_URL}/staffs`;
