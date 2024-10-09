@@ -30,6 +30,10 @@ export const POST_QUESTION_BANK = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/generate_questions`; 
  export const GET_GENERATED_QUESTIONS = ( submissionId: number ) => 
     `${BASE_URL}/questions/${submissionId}`; 
+ export const REGENERATE_QUESTIONS_FOR_ONE = (unitCode: string, projectName: string, submissionId: number) => 
+    `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/re_generate_questions/${encodeURIComponent(submissionId)}`;
+
+
 
 //Rubric Gen
 export const GENERATE_RUBRIC = `${BASE_URL}/generate_rubric`;

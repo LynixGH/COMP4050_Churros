@@ -3,6 +3,7 @@
 import React, { useState, useEffect, CSSProperties } from "react";
 import axios from "axios";
 import { GET_GENERATED_QUESTIONS } from "@/api";
+import { REGENERATE_QUESTIONS_FOR_ONE } from "@/api";
 
 interface AIQuestionCategory {
   [questionKey: string]: string;
@@ -103,7 +104,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
         if (response.status === 200 && response.data) {
           const data: ReviewData[] = response.data;
-          setReviewData(data[0]);
+          setReviewData(data[data.length - 1]);
         } else {
           console.error("Data not found, using dummy data.");
           setReviewData(dummyData);
@@ -121,6 +122,43 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
     fetchData();
   }, [submissionId]);
+
+  const handleSelectiveGenerate = async () => {
+    const selectedCategories = Object.entries(selectedAIQuestions)
+      .filter(([_, questions]) => Object.values(questions).some(Boolean))
+      .map(([category]) => category);
+  
+    if (selectedCategories.length === 0) {
+      alert("Please select at least one question to regenerate.");
+      return;
+    }
+  
+    try {
+      // Send a POST request for selected AI questions regeneration
+      for (let category of selectedCategories) {
+        const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
+        await axios.post(generateUrl);
+      }
+  
+      // Fetch updated questions after regeneration
+      setLoading(true);
+      const response = await axios.get(
+        `${GET_GENERATED_QUESTIONS(submissionId)}`
+      );
+      if (response.status === 200 && response.data) {
+        const data: ReviewData[] = response.data;
+        setReviewData(data[0]);
+        setSelectedAIQuestions({});  // Clear selections after regeneration
+      } else {
+        console.error("Data not found after regeneration.");
+      }
+    } catch (err) {
+      console.error("Error regenerating selected questions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   // Active Question Select
   const handleEditClick = (
@@ -199,21 +237,22 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   // Task 2: Handle Regen All
   const handleRegenAll = async () => {
     try {
-      const BASE_URL = "http://3.25.103.58";
 
-      await axios.post(
-        `${BASE_URL}/units/${encodeURIComponent(
-          unitCode
-        )}/projects/${encodeURIComponent(projectName)}/generate_questions`
-      );
+      // Use the utility function to generate the URL for the POST request
+      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
+
+      // Send the POST request to regenerate questions
+      await axios.post(generateUrl);
 
       // Fetch the updated data after regeneration
       setLoading(true);
-      const response = await axios.get(`http://3.25.103.58/questions/11`);
-
+      const response = await axios.get(
+        `${GET_GENERATED_QUESTIONS(submissionId)}`
+      );
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
         setReviewData(data[0]);
+
         // Clear selected AI questions after regeneration
         setSelectedAIQuestions({});
       } else {
@@ -225,6 +264,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       setLoading(false);
     }
   };
+
+
+
 
   if (loading) {
     return <p>Loading review questions...</p>;
@@ -409,9 +451,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
         {activeTab === "ai" && (
           <>
-            <button style={styles.regenButton} onClick={handleRegenAll}>
-              Regen All
-            </button>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button style={styles.regenButton} onClick={handleRegenAll}>
+                Regen All
+              </button>
+              <button style={styles.regenButton} onClick={handleSelectiveGenerate}>
+                Selective Generate
+              </button>
+            </div>
+
             {reviewData.ai_questions && (
               <div>
                 {Object.entries(reviewData.ai_questions).map(
@@ -442,18 +490,14 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                         : styles.tableRowOdd
                                   }
                                   onClick={() =>
-                                    handleAIQuestionSelect(
-                                      category,
-                                      questionKey
-                                    )
+                                    handleAIQuestionSelect(category, questionKey)
                                   }
                                 >
                                   <td style={styles.questionText}>
                                     {editingQuestion &&
                                       editingQuestion.type === "ai" &&
                                       editingQuestion.category === category &&
-                                      editingQuestion.questionKey ===
-                                      questionKey ? (
+                                      editingQuestion.questionKey === questionKey ? (
                                       <input
                                         type="text"
                                         value={editingQuestion.questionText}
@@ -468,8 +512,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                     {editingQuestion &&
                                       editingQuestion.type === "ai" &&
                                       editingQuestion.category === category &&
-                                      editingQuestion.questionKey ===
-                                      questionKey ? (
+                                      editingQuestion.questionKey === questionKey ? (
                                       <>
                                         <button
                                           style={styles.saveButton}
@@ -514,10 +557,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
             )}
           </>
         )}
+
+
+
       </div>
     </div>
   );
 };
+
+
 
 // Helper function to format category names
 const formatCategoryName = (category: string) => {
