@@ -1,5 +1,7 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
+import { GET_ALL_TA, GET_ALL_STAFF, POST_TA, DELETE_TA } from '@/api';
+
 
 interface Tutor {
   id: number;
@@ -11,45 +13,124 @@ interface TutorsProps {
 }
 
 const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
-  // Dummy data for tutors specific to the unit
-  const initialTutors: Tutor[] = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' }
-  ];
 
-  // Dummy data for all available tutors
-  const initialAllTutors: Tutor[] = [
-    { id: 3, name: 'Michael Johnson' },
-    { id: 4, name: 'Emily Davis' },
-    { id: 5, name: 'Chris Lee' }
-  ];
-
-  const [tutors, setTutors] = useState<Tutor[]>(initialTutors);
-  const [allTutors, setAllTutors] = useState<Tutor[]>(initialAllTutors);
-  const [loading, setLoading] = useState<boolean>(false); // Set to false as we're using dummy data
+  const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Tutor[]>([]);
+  const [allStaff, setAllStaff] = useState<Tutor[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<Tutor[]>([]); // To track newly added tutors
+  const [removedStaff, setRemovedStaff] = useState<Tutor[]>([]);   // To track removed tutors
+  const [role, setRole] = useState<string>('TA'); // Role can be adjusted later if needed
 
-  // Handle add tutor to unit
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(GET_ALL_TA(unitCode));
+        console.log(response.data); // Add this to inspect the data
+        setTutors(
+          response.data.collaborators.map((collab: any) => ({
+            id: collab.staff_id,
+            name: collab.staff_name
+          }))
+        );
+      } catch (error) {
+        console.error('Error fetching tutors:', error);
+        setError('Failed to fetch tutors');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTutors();
+  }, [unitCode]);
+
+  useEffect(() => {
+    if (isEditing) {
+      const fetchAllStaff = async () => {
+        try {
+          const response = await axios.get(GET_ALL_STAFF);
+          console.log(response.data);  // Inspect the full response
+          setAllStaff(
+            response.data.staffs.map((staff: any) => ({
+              id: staff.staff_id,
+              name: staff.staff_name
+            }))
+          );
+        } catch (error) {
+          console.error('Error fetching staff:', error);
+          setError('Failed to fetch staff');
+        }
+      };
+
+      fetchAllStaff();
+    }
+  }, [isEditing]);
+
+
+
+  // Handle add tutor to temporary selection list
   const addTutorToUnit = (tutor: Tutor) => {
-    // Dummy add logic
-    setTutors([...tutors, tutor]); // Add tutor to the state
+    setSelectedStaff([...selectedStaff, tutor]);
+    setTutors([...tutors, tutor]); // Add the tutor to the list for immediate display
     setSearchResults([]); // Clear search results
     setSearchQuery(''); // Clear search query
   };
 
-  // Handle remove tutor from unit
+  // Handle remove tutor from temporary removal list
   const removeTutor = (id: number) => {
-    // Dummy remove logic
-    setTutors(tutors.filter(tutor => tutor.id !== id)); // Remove tutor from state
+    const removedTutor = tutors.find((tutor) => tutor.id === id);
+    if (removedTutor) {
+      setRemovedStaff([...removedStaff, removedTutor]); // Track removed tutors
+      setTutors(tutors.filter(tutor => tutor.id !== id)); // Immediately remove from display
+    }
   };
 
-  // Toggle editing mode
-  const toggleEditMode = () => {
-    setIsEditing(!isEditing);
-    setError(null);
+  const toggleEditMode = async () => {
+    if (isEditing) {
+      // Submit added tutors
+      if (selectedStaff.length > 0) {
+        try {
+          await Promise.all(
+            selectedStaff.map(async (staff) => {
+              const response = await axios.post(POST_TA(unitCode), {
+                staff_id: staff.id,
+                staff_name: staff.name,
+                role: role // Send the role, can be adjusted
+              });
+              console.log('Added tutor:', response.data);
+            })
+          );
+        } catch (error) {
+          console.error('Error adding tutors to unit:', error);
+          setError('Failed to add tutors to the unit');
+        }
+      }
+  
+      // Submit removed tutors
+      if (removedStaff.length > 0) {
+        try {
+          await Promise.all(
+            removedStaff.map(async (staff) => {
+              const response = await axios.delete(DELETE_TA(unitCode, staff.id));
+              console.log('Deleted tutor:', response.data); // Log the response for debugging
+            })
+          );
+        } catch (error) {
+          console.error('Error removing tutors from unit:', error);
+          setError('Failed to remove tutors from the unit');
+        }
+      }
+  
+      // Clear selected and removed staff after submission
+      setSelectedStaff([]);
+      setRemovedStaff([]);
+    }
+  
+    setIsEditing(!isEditing); // Toggle the edit mode
   };
 
   // Handle search input change
@@ -58,11 +139,11 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
     setSearchQuery(query);
 
     if (query.length > 0) {
-      // Filter tutors based on search query
-      const filteredTutors = allTutors.filter(tutor =>
-        tutor.name.toLowerCase().includes(query.toLowerCase())
+      // Filter the allStaff list based on the search query
+      const filteredStaff = allStaff.filter(staff =>
+        staff.name.toLowerCase().includes(query.toLowerCase())
       );
-      setSearchResults(filteredTutors);
+      setSearchResults(filteredStaff);
     } else {
       setSearchResults([]);
     }
@@ -105,19 +186,19 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
         <div style={styles.addTutorSection}>
           <input
             type="text"
-            placeholder="Search for a tutor to add..."
+            placeholder="Search for a staff member to add..."
             value={searchQuery}
             onChange={handleSearchChange}
             style={styles.searchInput}
           />
           <div style={styles.searchResults}>
-            {searchResults.map(tutor => (
+            {searchResults.map(staff => (
               <div
-                key={tutor.id}
-                onClick={() => addTutorToUnit(tutor)}
+                key={staff.id}
+                onClick={() => addTutorToUnit(staff)}
                 style={styles.searchResultItem}
               >
-                {tutor.name}
+                {staff.name}
               </div>
             ))}
           </div>
