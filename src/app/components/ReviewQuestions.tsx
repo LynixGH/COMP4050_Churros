@@ -83,21 +83,15 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
     "static"
   );
-  const [editingQuestion, setEditingQuestion] = useState<{
-    category?: string;
-    questionKey: string;
-    questionText: string;
-    type: "ai" | "static" | "random";
-    index?: number;
-  } | null>(null);
-  const [selectedAIQuestions, setSelectedAIQuestions] = useState<{
-    [category: string]: { [questionKey: string]: boolean };
+
+  // State for selected reasons
+  const [selectedReasons, setSelectedReasons] = useState<{
+    [category: string]: { [questionKey: string]: string };
   }>({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-
         const response = await axios.get(
           `${GET_GENERATED_QUESTIONS(submissionId)}`
         );
@@ -124,22 +118,52 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   }, [submissionId]);
 
   const handleSelectiveGenerate = async () => {
-    const selectedCategories = Object.entries(selectedAIQuestions)
-      .filter(([_, questions]) => Object.values(questions).some(Boolean))
-      .map(([category]) => category);
-  
-    if (selectedCategories.length === 0) {
-      alert("Please select at least one question to regenerate.");
+    // Map category names to question types
+    const questionTypeMap: { [key: string]: string } = {
+      analysis_and_evaluation: "Analysis and Evaluation",
+      application_and_problem_solving: "Application and Problem Solving",
+      factual_recall: "Factual Recall",
+      open_ended: "Open-ended",
+    };
+
+    const questionReasonArray = [];
+
+    for (let [category, questions] of Object.entries(
+      reviewData!.ai_questions
+    )) {
+      for (let [questionKey, questionText] of Object.entries(questions)) {
+        const reason = selectedReasons[category]?.[questionKey];
+        if (reason) {
+          const questionType = questionTypeMap[category] || category;
+          questionReasonArray.push({
+            [questionKey]: questionText,
+            reason: reason,
+            question_type: questionType,
+          });
+        }
+      }
+    }
+
+    if (questionReasonArray.length === 0) {
+      alert("Please select at least one question and a reason.");
       return;
     }
-  
+
+    // Prepare the payload
+    const payload = {
+      question_reason: questionReasonArray,
+    };
+
     try {
-      // Send a POST request for selected AI questions regeneration
-      for (let category of selectedCategories) {
-        const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
-        await axios.post(generateUrl);
-      }
-  
+      // Send the POST request with the payload
+      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(
+        unitCode,
+        projectName,
+        submissionId
+      );
+
+      await axios.post(generateUrl, payload);
+
       // Fetch updated questions after regeneration
       setLoading(true);
       const response = await axios.get(
@@ -148,7 +172,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
         setReviewData(data[0]);
-        setSelectedAIQuestions({});  // Clear selections after regeneration
+
+        // Clear selected reasons after regeneration
+        setSelectedReasons({});
       } else {
         console.error("Data not found after regeneration.");
       }
@@ -158,88 +184,43 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       setLoading(false);
     }
   };
-  
 
-  // Active Question Select
-  const handleEditClick = (
-    type: "ai" | "static" | "random",
+  // Handle reason selection
+  const handleReasonChange = (
+    category: string,
     questionKey: string,
-    questionText: string,
-    category?: string,
-    index?: number
+    reason: string
   ) => {
-    setEditingQuestion({ type, questionKey, questionText, category, index });
+    setSelectedReasons((prevReasons) => ({
+      ...prevReasons,
+      [category]: {
+        ...prevReasons[category],
+        [questionKey]: reason,
+      },
+    }));
   };
 
-  const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editingQuestion) {
-      setEditingQuestion({
-        ...editingQuestion,
-        questionText: e.target.value,
-      });
-    }
-  };
-
-  const handleSaveQuestion = () => {
-    if (editingQuestion && reviewData) {
-      const updatedReviewData = { ...reviewData };
-
-      if (editingQuestion.type === "ai" && editingQuestion.category) {
-        updatedReviewData.ai_questions[editingQuestion.category][
-          editingQuestion.questionKey
-        ] = editingQuestion.questionText;
-      } else if (
-        editingQuestion.type === "static" &&
-        editingQuestion.index !== undefined
-      ) {
-        updatedReviewData.static_questions[editingQuestion.index] =
-          editingQuestion.questionText;
-      } else if (
-        editingQuestion.type === "random" &&
-        editingQuestion.index !== undefined
-      ) {
-        updatedReviewData.random_questions[editingQuestion.index].question =
-          editingQuestion.questionText;
-      }
-
-      setReviewData(updatedReviewData);
-      setEditingQuestion(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingQuestion(null);
-  };
-
-  // Task -1: Handle AI Question Selection
-  const handleAIQuestionSelect = (category: string, questionKey: string) => {
-    setSelectedAIQuestions((prevState) => {
-      const categorySelections = prevState[category] || {};
-      const isSelected = categorySelections[questionKey];
+  const handleCancelReason = (category: string, questionKey: string) => {
+    setSelectedReasons((prevReasons) => {
+      const newCategoryReasons = { ...prevReasons[category] };
+      delete newCategoryReasons[questionKey];
 
       return {
-        ...prevState,
-        [category]: {
-          ...categorySelections,
-          [questionKey]: !isSelected,
-        },
+        ...prevReasons,
+        [category]: newCategoryReasons,
       };
     });
   };
 
-  const isAIQuestionSelected = (category: string, questionKey: string) => {
-    return (
-      selectedAIQuestions[category] &&
-      selectedAIQuestions[category][questionKey]
-    );
-  };
-
-  // Task 2: Handle Regen All
+  // Handle Regen All
   const handleRegenAll = async () => {
     try {
-
       // Use the utility function to generate the URL for the POST request
-      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
+      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(
+        unitCode,
+        projectName,
+        submissionId
+      );
 
       // Send the POST request to regenerate questions
       await axios.post(generateUrl);
@@ -253,8 +234,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
         const data: ReviewData[] = response.data;
         setReviewData(data[0]);
 
-        // Clear selected AI questions after regeneration
-        setSelectedAIQuestions({});
+        // Clear selected reasons after regeneration
+        setSelectedReasons({});
       } else {
         console.error("Data not found after regeneration.");
       }
@@ -264,9 +245,6 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       setLoading(false);
     }
   };
-
-
-
 
   if (loading) {
     return <p>Loading review questions...</p>;
@@ -318,55 +296,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                           : styles.tableRowOdd
                       }
                     >
-                      <td style={styles.questionText}>
-                        {editingQuestion &&
-                          editingQuestion.type === "static" &&
-                          editingQuestion.index === index ? (
-                          <input
-                            type="text"
-                            value={editingQuestion.questionText}
-                            onChange={handleQuestionChange}
-                            style={styles.input}
-                          />
-                        ) : (
-                          question
-                        )}
-                      </td>
-                      <td style={styles.actionCell}>
-                        {editingQuestion &&
-                          editingQuestion.type === "static" &&
-                          editingQuestion.index === index ? (
-                          <>
-                            <button
-                              style={styles.saveButton}
-                              onClick={handleSaveQuestion}
-                            >
-                              Save
-                            </button>
-                            <button
-                              style={styles.cancelButton}
-                              onClick={handleCancelEdit}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            style={styles.editButton}
-                            onClick={() =>
-                              handleEditClick(
-                                "static",
-                                "",
-                                question,
-                                undefined,
-                                index
-                              )
-                            }
-                          >
-                            Edit
-                          </button>
-                        )}
-                      </td>
+                      <td style={styles.questionText}>{question}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -391,55 +321,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                             : styles.tableRowOdd
                         }
                       >
-                        <td style={styles.questionText}>
-                          {editingQuestion &&
-                            editingQuestion.type === "random" &&
-                            editingQuestion.index === index ? (
-                            <input
-                              type="text"
-                              value={editingQuestion.questionText}
-                              onChange={handleQuestionChange}
-                              style={styles.input}
-                            />
-                          ) : (
-                            q.question
-                          )}
-                        </td>
-                        <td style={styles.actionCell}>
-                          {editingQuestion &&
-                            editingQuestion.type === "random" &&
-                            editingQuestion.index === index ? (
-                            <>
-                              <button
-                                style={styles.saveButton}
-                                onClick={handleSaveQuestion}
-                              >
-                                Save
-                              </button>
-                              <button
-                                style={styles.cancelButton}
-                                onClick={handleCancelEdit}
-                              >
-                                Cancel
-                              </button>
-                            </>
-                          ) : (
-                            <button
-                              style={styles.editButton}
-                              onClick={() =>
-                                handleEditClick(
-                                  "random",
-                                  "",
-                                  q.question,
-                                  undefined,
-                                  index
-                                )
-                              }
-                            >
-                              Edit
-                            </button>
-                          )}
-                        </td>
+                        <td style={styles.questionText}>{q.question}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -455,7 +337,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
               <button style={styles.regenButton} onClick={handleRegenAll}>
                 Regen All
               </button>
-              <button style={styles.regenButton} onClick={handleSelectiveGenerate}>
+              <button
+                style={styles.regenButton}
+                onClick={handleSelectiveGenerate}
+              >
                 Selective Generate
               </button>
             </div>
@@ -475,72 +360,58 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                               [questionKey, questionText]: [string, string],
                               index
                             ) => {
-                              const isSelected = isAIQuestionSelected(
-                                category,
-                                questionKey
-                              );
+                              const reason =
+                                selectedReasons[category]?.[questionKey] || "";
                               return (
                                 <tr
                                   key={questionKey}
                                   style={
-                                    isSelected
-                                      ? { ...styles.tableRowSelected }
-                                      : index % 2 === 0
-                                        ? styles.tableRowEven
-                                        : styles.tableRowOdd
-                                  }
-                                  onClick={() =>
-                                    handleAIQuestionSelect(category, questionKey)
+                                    index % 2 === 0
+                                      ? styles.tableRowEven
+                                      : styles.tableRowOdd
                                   }
                                 >
                                   <td style={styles.questionText}>
-                                    {editingQuestion &&
-                                      editingQuestion.type === "ai" &&
-                                      editingQuestion.category === category &&
-                                      editingQuestion.questionKey === questionKey ? (
-                                      <input
-                                        type="text"
-                                        value={editingQuestion.questionText}
-                                        onChange={handleQuestionChange}
-                                        style={styles.input}
-                                      />
-                                    ) : (
-                                      questionText
-                                    )}
+                                    {questionText}
                                   </td>
                                   <td style={styles.actionCell}>
-                                    {editingQuestion &&
-                                      editingQuestion.type === "ai" &&
-                                      editingQuestion.category === category &&
-                                      editingQuestion.questionKey === questionKey ? (
-                                      <>
-                                        <button
-                                          style={styles.saveButton}
-                                          onClick={handleSaveQuestion}
-                                        >
-                                          Save
-                                        </button>
-                                        <button
-                                          style={styles.cancelButton}
-                                          onClick={handleCancelEdit}
-                                        >
-                                          Cancel
-                                        </button>
-                                      </>
-                                    ) : (
+                                    {/* Dropdown for selecting a reason */}
+                                    <select
+                                      value={reason}
+                                      onChange={(e) =>
+                                        handleReasonChange(
+                                          category,
+                                          questionKey,
+                                          e.target.value
+                                        )
+                                      }
+                                    >
+                                      <option value="">Choose a reason</option>
+                                      <option value="Too vague">Too vague</option>
+                                      <option value="Not aligned with assignment content">
+                                        Not aligned with assignment content
+                                      </option>
+                                      <option value="Grammatical issues">
+                                        Grammatical issues
+                                      </option>
+                                      <option value="Needs elaboration">
+                                        Needs elaboration
+                                      </option>
+                                      <option value="Other">Other</option>
+                                    </select>
+
+                                    {/* Show Cancel button if a reason is selected */}
+                                    {reason && (
                                       <button
-                                        style={styles.editButton}
-                                        onClick={(e) => {
-                                          e.stopPropagation(); // Prevent row click
-                                          handleEditClick(
-                                            "ai",
-                                            questionKey,
-                                            questionText,
-                                            category
-                                          );
-                                        }}
+                                        style={styles.cancelButton}
+                                        onClick={() =>
+                                          handleCancelReason(
+                                            category,
+                                            questionKey
+                                          )
+                                        }
                                       >
-                                        Edit
+                                        Cancel
                                       </button>
                                     )}
                                   </td>
@@ -557,15 +428,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
             )}
           </>
         )}
-
-
-
       </div>
     </div>
   );
 };
-
-
 
 // Helper function to format category names
 const formatCategoryName = (category: string) => {
@@ -578,126 +444,99 @@ const formatCategoryName = (category: string) => {
 // Inline styles for the component
 const styles: { [key: string]: CSSProperties } = {
   container: {
-    padding: '24px',
-    fontFamily: 'Arial, sans-serif',
+    padding: "24px",
+    fontFamily: "Arial, sans-serif",
   },
   title: {
-    fontSize: '28px',
-    marginBottom: '24px',
-    textAlign: 'center',
+    fontSize: "28px",
+    marginBottom: "24px",
+    textAlign: "center",
   },
   tabContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '24px',
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "24px",
   },
   tab: {
-    padding: '12px 24px',
-    margin: '0 8px',
-    backgroundColor: '#f1f1f1',
-    border: 'none',
-    borderRadius: '4px 4px 0 0',
-    cursor: 'pointer',
-    fontSize: '16px',
+    padding: "12px 24px",
+    margin: "0 8px",
+    backgroundColor: "#f1f1f1",
+    border: "none",
+    borderRadius: "4px 4px 0 0",
+    cursor: "pointer",
+    fontSize: "16px",
   },
   activeTab: {
-    padding: '12px 24px',
-    margin: '0 8px',
-    backgroundColor: '#fff',
-    border: '1px solid #ccc',
-    borderBottom: 'none',
-    borderRadius: '4px 4px 0 0',
-    cursor: 'pointer',
-    fontSize: '16px',
+    padding: "12px 24px",
+    margin: "0 8px",
+    backgroundColor: "#fff",
+    border: "1px solid #ccc",
+    borderBottom: "none",
+    borderRadius: "4px 4px 0 0",
+    cursor: "pointer",
+    fontSize: "16px",
   },
   tabContent: {
-    border: '1px solid #ccc',
-    borderRadius: '0 4px 4px 4px',
-    padding: '16px',
-    backgroundColor: '#fff',
+    border: "1px solid #ccc",
+    borderRadius: "0 4px 4px 4px",
+    padding: "16px",
+    backgroundColor: "#fff",
   },
   category: {
-    marginBottom: '24px',
+    marginBottom: "24px",
   },
   categoryHeader: {
-    fontSize: '20px',
-    marginBottom: '12px',
-    color: '#333',
+    fontSize: "20px",
+    marginBottom: "12px",
+    color: "#333",
   },
   table: {
-    width: '100%',
-    borderCollapse: 'collapse',
+    width: "100%",
+    borderCollapse: "collapse",
   },
   tableRowEven: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   tableRowOdd: {
-    backgroundColor: '#fff',
-  },
-  tableRowSelected: {
-    backgroundColor: '#cce5ff',
+    backgroundColor: "#fff",
   },
   questionText: {
-    padding: '12px',
-    border: '1px solid #ddd',
-    width: '85%',
-    verticalAlign: 'top',
-    cursor: 'pointer',
+    padding: "12px",
+    border: "1px solid #ddd",
+    verticalAlign: "top",
   },
   actionCell: {
-    padding: '12px',
-    border: '1px solid #ddd',
-    width: '15%',
-    textAlign: 'right',
-  },
-  editButton: {
-    padding: '8px 16px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  saveButton: {
-    padding: '8px 16px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginRight: '8px',
-  },
-  cancelButton: {
-    padding: '8px 16px',
-    backgroundColor: '#dc3545',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
+    padding: "12px",
+    border: "1px solid #ddd",
+    width: "35%",
+    verticalAlign: "top",
   },
   randomButton: {
-    padding: '10px 20px',
-    backgroundColor: '#17a2b8', // Computer-friendly shade of blue
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginBottom: '16px',
+    padding: "10px 20px",
+    backgroundColor: "#17a2b8",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginBottom: "16px",
   },
   regenButton: {
-    padding: '10px 20px',
-    backgroundColor: '#ffc107', // Yellow color
-    color: '#000',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginBottom: '16px',
+    padding: "10px 20px",
+    backgroundColor: "#ffc107",
+    color: "#000",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginBottom: "16px",
   },
-  input: {
-    width: '100%',
-    padding: '8px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
+  cancelButton: {
+    padding: "8px 16px",
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginLeft: "8px",
   },
 };
 
