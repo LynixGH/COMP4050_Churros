@@ -23,11 +23,9 @@ const Assignments: React.FC<Assignment> = ({
   const [newName, setNewName] = useState<string>("");
 
   useEffect(() => {
-    console.log("Did something rather than nothing");
     axios
       .get(GET_PROJECTS(unit_code))
       .then((response) => {
-        console.log(response);
         if (response.status === 200 && response.data) {
           setAssignments(response.data);
           setLoading(false);
@@ -49,12 +47,14 @@ const Assignments: React.FC<Assignment> = ({
     setNewName("");
   };
 
-  const handleEditClick = (assignment: Assignment) => {
+  const handleEditClick = (assignment: Assignment, e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedAssignment(assignment);
     setNewName(assignment.project_name);
   };
 
-  const handleDeleteClick = (assignment: Assignment) => {
+  const handleDeleteClick = (assignment: Assignment, e: React.MouseEvent) => {
+    e.stopPropagation();
     axios
       .delete(DELETE_PROJECT(unit_code, assignment.project_name))
       .then((response) => {
@@ -113,34 +113,36 @@ const Assignments: React.FC<Assignment> = ({
   return (
     <div style={styles.container}>
       {assignments.map((assignment) => (
-        
-        <Link key={assignment.project_name}
-          href={`/dashboard/userDashboard/${unit_code}/${assignment.project_name}`}
-        >
-          <div key={assignment.project_id} style={styles.box}>
+        <div key={assignment.project_id} style={styles.box}>
+          {/* Wrapping only the project info in the Link */}
+          <Link
+            href={`/dashboard/userDashboard/${unit_code}/${assignment.project_name}`}
+            passHref
+          >
             <div style={styles.assignmentInfo}>
               <h3>{assignment.project_name || "Unnamed Project"}</h3>
               <p>Unit Code: {assignment.unit_code}</p>
             </div>
+          </Link>
 
-            {isEditMode && (
-              <div style={styles.actions}>
-                <button
-                  style={styles.actionButton}
-                  onClick={() => handleEditClick(assignment)}
-                >
-                  Edit
-                </button>
-                <button
-                  style={styles.actionButton}
-                  onClick={() => handleDeleteClick(assignment)}
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        </Link>
+          {/* Action buttons, separate from Link */}
+          {isEditMode && (
+            <div style={styles.actions}>
+              <button
+                style={styles.actionButton}
+                onClick={(e) => handleEditClick(assignment, e)}
+              >
+                Edit
+              </button>
+              <button
+                style={styles.actionButton}
+                onClick={(e) => handleDeleteClick(assignment, e)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
       ))}
 
       {isEditMode ? (
@@ -199,6 +201,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   assignmentInfo: {
     flex: 1,
+    cursor: "pointer",
   },
   editButton: {
     marginTop: "10px",
