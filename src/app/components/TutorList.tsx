@@ -1,6 +1,6 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import axios from 'axios';
-import { GET_ALL_TA, GET_ALL_STAFF, POST_TA, DELETE_TA } from '@/api';
+import { GET_ALL_TA, GET_ALL_NON_TA, POST_TA, DELETE_TA } from '@/api';
 
 
 interface Tutor {
@@ -50,25 +50,25 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
 
   useEffect(() => {
     if (isEditing) {
-      const fetchAllStaff = async () => {
+      const fetchNonCollaborators = async () => {
         try {
-          const response = await axios.get(GET_ALL_STAFF);
+          const response = await axios.get(GET_ALL_NON_TA(unitCode));  // Use the new endpoint
           console.log(response.data);  // Inspect the full response
           setAllStaff(
-            response.data.staffs.map((staff: any) => ({
+            response.data.non_collaborators.map((staff: any) => ({
               id: staff.staff_id,
               name: staff.staff_name
             }))
           );
         } catch (error) {
-          console.error('Error fetching staff:', error);
-          setError('Failed to fetch staff');
+          console.error('Error fetching staff list:', error);
+          setError('Failed to fetch staff list');
         }
       };
-
-      fetchAllStaff();
+  
+      fetchNonCollaborators();
     }
-  }, [isEditing]);
+  }, [isEditing, unitCode]);
 
 
 
