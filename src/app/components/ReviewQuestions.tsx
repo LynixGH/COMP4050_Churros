@@ -1,3 +1,5 @@
+// ReviewQuestions.tsx
+
 "use client";
 
 import React, { useState, useEffect, CSSProperties } from "react";
@@ -89,6 +91,11 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     [category: string]: { [questionKey: string]: string };
   }>({});
 
+  // State for selected questions
+  const [selectedQuestions, setSelectedQuestions] = useState<{
+    [category: string]: { [questionKey: string]: boolean };
+  }>({});
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -117,6 +124,21 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     fetchData();
   }, [submissionId]);
 
+  // Handle checkbox change
+  const handleCheckboxChange = (
+    category: string,
+    questionKey: string,
+    isChecked: boolean
+  ) => {
+    setSelectedQuestions((prevSelected) => ({
+      ...prevSelected,
+      [category]: {
+        ...prevSelected[category],
+        [questionKey]: isChecked,
+      },
+    }));
+  };
+
   const handleSelectiveGenerate = async () => {
     // Map category names to question types
     const questionTypeMap: { [key: string]: string } = {
@@ -127,27 +149,56 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     };
 
     const questionReasonArray = [];
+    let hasSelectedQuestion = false;
+    let allSelectedHaveReasons = true;
+    let reasonWithoutSelection = false;
 
     for (let [category, questions] of Object.entries(
       reviewData!.ai_questions
     )) {
       for (let [questionKey, questionText] of Object.entries(questions)) {
+        const isSelected =
+          selectedQuestions[category]?.[questionKey] || false;
         const reason = selectedReasons[category]?.[questionKey];
-        if (reason) {
-          const questionType = questionTypeMap[category] || category;
-          questionReasonArray.push({
-            [questionKey]: questionText,
-            reason: reason,
-            question_type: questionType,
-          });
+
+        if (isSelected) {
+          hasSelectedQuestion = true;
+          if (!reason) {
+            allSelectedHaveReasons = false;
+          } else {
+            const questionType = questionTypeMap[category] || category;
+            questionReasonArray.push({
+              [questionKey]: questionText,
+              reason: reason,
+              question_type: questionType,
+            });
+          }
+        } else if (reason) {
+          reasonWithoutSelection = true;
         }
       }
     }
 
-    if (questionReasonArray.length === 0) {
-      alert("Please select at least one question and a reason.");
+    // Check for failsafe conditions
+    if (!hasSelectedQuestion) {
+      alert("Please select at least one question to regenerate.");
       return;
     }
+
+    if (!allSelectedHaveReasons) {
+      alert("Please provide a reason for each selected question.");
+      return;
+    }
+
+    if (reasonWithoutSelection) {
+      alert(
+        "You have provided reasons for questions that are not selected. Please select the questions or remove the reasons."
+      );
+      return;
+    }
+
+    // Before sending, output the question_reason array for debugging
+    console.log("Question Reasons to be sent:", questionReasonArray);
 
     // Prepare the payload
     const payload = {
@@ -173,8 +224,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
         const data: ReviewData[] = response.data;
         setReviewData(data[0]);
 
-        // Clear selected reasons after regeneration
+        // Clear selected reasons and selected questions after regeneration
         setSelectedReasons({});
+        setSelectedQuestions({});
       } else {
         console.error("Data not found after regeneration.");
       }
@@ -210,40 +262,6 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
         [category]: newCategoryReasons,
       };
     });
-  };
-
-  // Handle Regen All
-  const handleRegenAll = async () => {
-    try {
-      // Use the utility function to generate the URL for the POST request
-      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(
-        unitCode,
-        projectName,
-        submissionId
-      );
-
-      // Send the POST request to regenerate questions
-      await axios.post(generateUrl);
-
-      // Fetch the updated data after regeneration
-      setLoading(true);
-      const response = await axios.get(
-        `${GET_GENERATED_QUESTIONS(submissionId)}`
-      );
-      if (response.status === 200 && response.data) {
-        const data: ReviewData[] = response.data;
-        setReviewData(data[0]);
-
-        // Clear selected reasons after regeneration
-        setSelectedReasons({});
-      } else {
-        console.error("Data not found after regeneration.");
-      }
-    } catch (err) {
-      console.error("Error regenerating questions:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   if (loading) {
@@ -333,10 +351,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
         {activeTab === "ai" && (
           <>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <button style={styles.regenButton} onClick={handleRegenAll}>
-                Regen All
-              </button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
                 style={styles.regenButton}
                 onClick={handleSelectiveGenerate}
@@ -348,7 +363,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
             {reviewData.ai_questions && (
               <div>
                 {Object.entries(reviewData.ai_questions).map(
-                  ([category, questions]: [string, AIQuestionCategory]) => (
+                  ([category, questions]) => (
                     <div key={category} style={styles.category}>
                       <h4 style={styles.categoryHeader}>
                         {formatCategoryName(category)}
@@ -356,10 +371,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                       <table style={styles.table}>
                         <tbody>
                           {Object.entries(questions).map(
-                            (
-                              [questionKey, questionText]: [string, string],
-                              index
-                            ) => {
+                            ([questionKey, questionText], index) => {
+                              const isSelected =
+                                selectedQuestions[category]?.[questionKey] ||
+                                false;
                               const reason =
                                 selectedReasons[category]?.[questionKey] || "";
                               return (
@@ -371,9 +386,25 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                       : styles.tableRowOdd
                                   }
                                 >
+                                  {/* Checkbox Cell */}
+                                  <td style={styles.checkboxCell}>
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(e) =>
+                                        handleCheckboxChange(
+                                          category,
+                                          questionKey,
+                                          e.target.checked
+                                        )
+                                      }
+                                    />
+                                  </td>
+                                  {/* Question Text Cell */}
                                   <td style={styles.questionText}>
                                     {questionText}
                                   </td>
+                                  {/* Action Cell */}
                                   <td style={styles.actionCell}>
                                     {/* Dropdown for selecting a reason */}
                                     <select
@@ -386,8 +417,12 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                         )
                                       }
                                     >
-                                      <option value="">Choose a reason</option>
-                                      <option value="Too vague">Too vague</option>
+                                      <option value="">
+                                        Choose a reason
+                                      </option>
+                                      <option value="Too vague">
+                                        Too vague
+                                      </option>
                                       <option value="Not aligned with assignment content">
                                         Not aligned with assignment content
                                       </option>
@@ -397,7 +432,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
                                       <option value="Needs elaboration">
                                         Needs elaboration
                                       </option>
-                                      <option value="Other">Other</option>
+                                      <option value="Other">
+                                        Other
+                                      </option>
                                     </select>
 
                                     {/* Show Cancel button if a reason is selected */}
@@ -499,6 +536,13 @@ const styles: { [key: string]: CSSProperties } = {
   },
   tableRowOdd: {
     backgroundColor: "#fff",
+  },
+  checkboxCell: {
+    padding: "12px",
+    border: "1px solid #ddd",
+    width: "5%",
+    verticalAlign: "top",
+    textAlign: "center",
   },
   questionText: {
     padding: "12px",
