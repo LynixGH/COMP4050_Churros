@@ -8,13 +8,13 @@ const menuItems = [
         {
           icon: "/home.png",
           label: "Home",
-          href: "/dashboard/admin",
+          href: "http://localhost:3000/dashboard/userDashboard",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
           icon: "/subject.png",
           label: "Subjects",
-          href: "/list/subjects",
+          href: "http://localhost:3000/dashboard/userDashboard",
           visible: ["admin"],
         },
         {
