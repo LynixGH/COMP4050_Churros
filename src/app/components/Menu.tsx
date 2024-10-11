@@ -20,7 +20,7 @@ const menuItems = [
         {
           icon: "/assignment.png",
           label: "Rubric",
-          href: "/list/assignments",
+          href: "http://localhost:3000/dashboard/rubricGen",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
