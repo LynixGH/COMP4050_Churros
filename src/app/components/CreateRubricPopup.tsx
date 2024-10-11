@@ -103,13 +103,14 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
     const updatedCriteria = [...rubric.criteria];
     updatedCriteria[index] = {
       ...updatedCriteria[index],
-      [field]: [...updatedCriteria[index][field], ''],
+      [field]: [...(updatedCriteria[index][field] as string[]), ''], // Cast to string[]
     };
     setRubric((prevRubric) => ({
       ...prevRubric,
       criteria: updatedCriteria,
     }));
   };
+  
 
   const removeFieldFromCriterion = (index: number, field: keyof typeof rubric.criteria[0], fieldIndex: number) => {
     const updatedCriteria = [...rubric.criteria];
