@@ -242,7 +242,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
-        setReviewData(data[0]);
+        setReviewData(data[data.length - 1]);
+
+        console.log("Regenerated DATA", data)
 
         // Clear selected reasons and selected questions after regeneration
         setSelectedReasons({});
