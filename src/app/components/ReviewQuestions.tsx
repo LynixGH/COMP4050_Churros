@@ -8,37 +8,6 @@ import { GET_GENERATED_QUESTIONS } from "@/api";
 import { REGENERATE_QUESTIONS_FOR_ONE } from "@/api";
 import { GET_QUESTION_BANK } from "@/api";
 
-interface AIQuestionCategory {
-  [questionKey: string]: string;
-}
-
-interface AIQuestions {
-  [category: string]: AIQuestionCategory;
-}
-
-interface RandomQuestion {
-  question: string;
-}
-
-interface ReviewData {
-  ai_questions: AIQuestions;
-  project_title: string;
-  random_questions: RandomQuestion[];
-  static_questions: string[];
-  submission_id: number;
-  unit_code: string;
-}
-
-interface ReviewQuestionsProps {
-  submissionId: number;
-  projectName: string;
-  unitCode: string;
-}
-
-interface RandomQuestion {
-  question: string;  // <-- The declaration of `question` as a property inside RandomQuestion
-}
-
 
 const dummyData: ReviewData = {
   ai_questions: {
@@ -81,6 +50,44 @@ const dummyData: ReviewData = {
   unit_code: "CS101",
 };
 
+interface AIQuestionCategory {
+  [questionKey: string]: string;
+}
+
+
+
+interface AIQuestions {
+  [category: string]: AIQuestionCategory;
+}
+
+interface RandomQuestion {
+  question: string;
+}
+
+interface ReviewData {
+  ai_questions: AIQuestions;
+  project_title: string;
+  random_questions: RandomQuestion[];
+  static_questions: string[];
+  submission_id: number;
+  unit_code: string;
+}
+
+interface ReviewQuestionsProps {
+  submissionId: number;
+  projectName: string;
+  unitCode: string;
+}
+
+interface RandomQuestion {
+  question: string;
+}
+
+type RandomQuestionsDict = {
+  [key: string]: RandomQuestion;
+};
+
+
 const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   submissionId,
   projectName,
@@ -88,8 +95,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 }) => {
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); // Declare randomQuestions state
-
+// Change this type to reflect that randomQuestions is an array of RandomQuestion objects
+const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); // Array of questions
 
 
   const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
@@ -227,7 +234,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       );
       console.log("DEBUG - ", unitCode)
 
-      console.log("WORKING?",generateUrl)
+      console.log("WORKING?", generateUrl)
       await axios.post(generateUrl, payload);
 
       // Fetch updated questions after regeneration
@@ -237,8 +244,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       const response = await axios.get(
         `${GET_GENERATED_QUESTIONS(submissionId)}`
       );
-     
-      console.log("AFTER CASE",response)
+
+      console.log("AFTER CASE", response)
 
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
@@ -280,7 +287,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       const response = await axios.get(GET_QUESTION_BANK(unitCode, projectName));
 
       if (response.status === 200 && response.data) {
-        setRandomQuestions(response.data.random_questions); // Update state with fetched questions
+        console.log("Random Question:", response.data);
+        setRandomQuestions(response.data.questions); // Update state with the 'questions' array
       } else {
         console.error("No random questions found.");
       }
@@ -290,6 +298,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       setLoading(false); // Stop loading indicator after fetching
     }
   };
+
 
   const handleCancelReason = (category: string, questionKey: string) => {
     setSelectedReasons((prevReasons) => {
@@ -362,35 +371,37 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
           </>
         )}
 
-        {activeTab === "random" && (
-          <>
-            <button
-              style={styles.randomButton}
-              onClick={handleRandomButtonClick} // Attach event handler to the Random button
-            >
-              Fetch Random Questions
-            </button>
+{activeTab === "random" && (
+        <>
+          {/* Fetch Random Questions button for manual refresh */}
+          <button style={styles.randomButton} onClick={handleRandomButtonClick}>
+            Fetch Random Questions
+          </button>
 
-            {randomQuestions.length > 0 && (
-              <table style={styles.table}>
-                <tbody>
-                  {randomQuestions.map((q, index) => (
-                    <tr
-                      key={index}
-                      style={
-                        index % 2 === 0
-                          ? styles.tableRowEven
-                          : styles.tableRowOdd
-                      }
-                    >
-                      <td style={styles.questionText}>{q.question}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </>
-        )}
+          {/* Render loading state or questions */}
+          {loading ? (
+            <p>Loading...</p>
+          ) : randomQuestions.length > 0 ? ( // Check if the array has questions
+            <table style={styles.table}>
+              <tbody>
+                {randomQuestions.map((questionObj, index) => (
+                  <tr
+                    key={index} // Use index or another unique identifier for each question
+                    style={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}
+                  >
+                    <td style={styles.questionText}>{questionObj.question}</td> {/* Render question text */}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No questions available.</p> // Display message if there are no questions
+          )}
+        </>
+      )}
+
+
+
 
         {activeTab === "ai" && (
           <>
