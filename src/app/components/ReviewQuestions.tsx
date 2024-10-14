@@ -225,13 +225,14 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
         projectName,
         submissionId
       );
+      console.log("DEBUG - ", unitCode)
+
 
       await axios.post(generateUrl, payload);
 
       // Fetch updated questions after regeneration
       setLoading(true);
 
-      console.log("DEBUG - ", unitCode)
 
       const response = await axios.get(
         `${GET_GENERATED_QUESTIONS(submissionId)}`
