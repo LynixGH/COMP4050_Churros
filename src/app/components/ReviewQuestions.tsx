@@ -6,6 +6,7 @@ import React, { useState, useEffect, CSSProperties } from "react";
 import axios from "axios";
 import { GET_GENERATED_QUESTIONS } from "@/api";
 import { REGENERATE_QUESTIONS_FOR_ONE } from "@/api";
+import { GET_QUESTION_BANK } from "@/api";
 
 interface AIQuestionCategory {
   [questionKey: string]: string;
@@ -33,6 +34,11 @@ interface ReviewQuestionsProps {
   projectName: string;
   unitCode: string;
 }
+
+interface RandomQuestion {
+  question: string;  // <-- The declaration of `question` as a property inside RandomQuestion
+}
+
 
 const dummyData: ReviewData = {
   ai_questions: {
@@ -82,6 +88,10 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 }) => {
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); // Declare randomQuestions state
+
+
+
   const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
     "static"
   );
@@ -140,7 +150,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
   };
 
   const handleSelectiveGenerate = async () => {
-    // Map category names to question types
+
     const questionTypeMap: { [key: string]: string } = {
       analysis_and_evaluation: "Analysis and Evaluation",
       application_and_problem_solving: "Application and Problem Solving",
@@ -252,6 +262,23 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     }));
   };
 
+  const handleRandomButtonClick = async () => {
+    try {
+      setLoading(true); // Show loading indicator while fetching
+      const response = await axios.get(GET_QUESTION_BANK(unitCode, projectName));
+
+      if (response.status === 200 && response.data) {
+        setRandomQuestions(response.data.random_questions); // Update state with fetched questions
+      } else {
+        console.error("No random questions found.");
+      }
+    } catch (error) {
+      console.error("Error fetching random questions:", error);
+    } finally {
+      setLoading(false); // Stop loading indicator after fetching
+    }
+  };
+
   const handleCancelReason = (category: string, questionKey: string) => {
     setSelectedReasons((prevReasons) => {
       const newCategoryReasons = { ...prevReasons[category] };
@@ -325,26 +352,30 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
         {activeTab === "random" && (
           <>
-            {reviewData.random_questions && (
-              <>
-                <button style={styles.randomButton}>Random</button>
-                <table style={styles.table}>
-                  <tbody>
-                    {reviewData.random_questions.map((q, index) => (
-                      <tr
-                        key={index}
-                        style={
-                          index % 2 === 0
-                            ? styles.tableRowEven
-                            : styles.tableRowOdd
-                        }
-                      >
-                        <td style={styles.questionText}>{q.question}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </>
+            <button
+              style={styles.randomButton}
+              onClick={handleRandomButtonClick} // Attach event handler to the Random button
+            >
+              Fetch Random Questions
+            </button>
+
+            {randomQuestions.length > 0 && (
+              <table style={styles.table}>
+                <tbody>
+                  {randomQuestions.map((q, index) => (
+                    <tr
+                      key={index}
+                      style={
+                        index % 2 === 0
+                          ? styles.tableRowEven
+                          : styles.tableRowOdd
+                      }
+                    >
+                      <td style={styles.questionText}>{q.question}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </>
         )}
