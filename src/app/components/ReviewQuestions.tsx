@@ -237,6 +237,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       const response = await axios.get(
         `${GET_GENERATED_QUESTIONS(submissionId)}`
       );
+     
+      console.log("AFTER CASE",response)
+
       if (response.status === 200 && response.data) {
         const data: ReviewData[] = response.data;
         setReviewData(data[0]);
