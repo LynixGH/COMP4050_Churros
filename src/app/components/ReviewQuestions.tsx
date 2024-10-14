@@ -227,7 +227,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       );
       console.log("DEBUG - ", unitCode)
 
-
+      console.log("WORKING?",generateUrl)
       await axios.post(generateUrl, payload);
 
       // Fetch updated questions after regeneration
