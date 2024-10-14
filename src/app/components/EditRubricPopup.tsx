@@ -92,6 +92,7 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
       if (response.status === 200) {
         alert('Rubric updated successfully!');
         onClose(rubric);  // Pass updated rubric back to parent component after successful update
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error updating rubric:', error);
