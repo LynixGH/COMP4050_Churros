@@ -22,8 +22,10 @@ export const POST_QUESTION_TEMPLATE = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/template`;
 export const GET_QUESTIONS_TEMPLATE = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/template`;
+
 export const GET_QUESTION_BANK = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/question_bank`;
+
 export const POST_QUESTION_BANK = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/question_bank`;
 export const GENERATE_ALL_QUESTIONS = (unitCode: string, projectName: string) =>

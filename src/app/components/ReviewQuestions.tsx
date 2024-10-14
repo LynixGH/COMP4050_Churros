@@ -158,10 +158,13 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
       open_ended: "Open-ended",
     };
 
+
     const questionReasonArray = [];
     let hasSelectedQuestion = false;
     let allSelectedHaveReasons = true;
     let reasonWithoutSelection = false;
+
+    console.log()
 
     for (let [category, questions] of Object.entries(
       reviewData!.ai_questions
@@ -227,6 +230,9 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       // Fetch updated questions after regeneration
       setLoading(true);
+
+      console.log("DEBUG - ", unitCode)
+
       const response = await axios.get(
         `${GET_GENERATED_QUESTIONS(submissionId)}`
       );
