@@ -135,7 +135,7 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
     try {
       const response = await axios.post(GENERATE_RUBRIC, rubric);
       if (response.status === 200) {
-        console.log('Rubric submitted successfully!');
+        alert('Rubric submitted successfully!');
         onClose(); // Close the form after submission
       }
     } catch (error) {

@@ -49,7 +49,7 @@ const RubricGen = () => {
       const response = await axios.delete(DEL_RUBRIC(rubricId));
   
       if (response.status === 200) {
-        console.log(`Rubric with ID: ${rubricId} successfully deleted.`);
+        alert(`Rubric with ID: ${rubricId} successfully deleted.`);
         setRubrics((prevRubrics) => prevRubrics.filter((rubric) => rubric.rubric_id !== rubricId));
         setDetailedRubrics((prevDetailedRubrics) => {
           const newDetailedRubrics = { ...prevDetailedRubrics };
