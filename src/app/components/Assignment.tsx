@@ -145,15 +145,22 @@ const Assignments: React.FC<Assignment> = ({
         </div>
       ))}
 
-      {isEditMode ? (
-        <button onClick={toggleEditMode} style={styles.cancelButton}>
-          Cancel Editing
-        </button>
+      {assignments.length == 0 ? (
+        <p>
+          There are no assignments for this unit.
+        </p>
       ) : (
-        <button onClick={toggleEditMode} style={styles.editButton}>
-          Edit Assignments
-        </button>
-      )}
+        isEditMode ? (
+          <button onClick={toggleEditMode} style={styles.cancelButton}>
+            Cancel Editing
+          </button>
+        ) : (
+          <button onClick={toggleEditMode} style={styles.editButton}>
+            Edit Assignments
+          </button>
+        )
+        )
+      }
 
       {selectedAssignment && (
         <div style={styles.modalOverlay}>
