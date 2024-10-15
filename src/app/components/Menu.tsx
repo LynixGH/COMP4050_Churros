@@ -23,12 +23,6 @@ const menuItems = [
           href: "http://localhost:3000/dashboard/rubricGen",
           visible: ["admin", "teacher", "student", "parent"],
         },
-        {
-          icon: "/calendar.png",
-          label: "Events",
-          href: "/list/events",
-          visible: ["admin", "teacher", "student", "parent"],
-        },
       ],
     },
     {
