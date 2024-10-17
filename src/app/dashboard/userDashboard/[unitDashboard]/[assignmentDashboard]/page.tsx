@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import QuestionTemplate from "@/app/components/QuestionTemplate"; // Import the new component
 import Link from "next/link";
-import { GET_SUBMISSIONS , BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS} from '@/api';
+import { GET_SUBMISSIONS, BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS, GET_QUESTIONS_TEMPLATE } from '@/api';
 
 export default function AssignmentDashboard({
   params,
@@ -22,6 +22,8 @@ export default function AssignmentDashboard({
   const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
   const [showTemplate, setShowTemplate] = useState<boolean>(false); // State to manage overlay visibility
   const [templateSaved, setTemplateSaved] = useState<boolean>(false); // State to track if the template has been saved
+  const [showViewTemplatePopup, setShowViewTemplatePopup] = useState<boolean>(false); // State to control the View Template popup
+  const [questionTemplate, setQuestionTemplate] = useState<any>(null); // State to store question template data
 
   useEffect(() => {
     fetchSubmissions();
@@ -30,7 +32,6 @@ export default function AssignmentDashboard({
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get(
-        // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`
         GET_SUBMISSIONS(unitCode, projectName)
       ); // Use dynamic URL
       setSubmissions(response.data.submission_files);
@@ -51,17 +52,14 @@ export default function AssignmentDashboard({
     if (selectedFiles && selectedFiles.length > 0) {
       setLoading(true);
       const formData = new FormData();
-      // Append multiple files to formData
       Array.from(selectedFiles).forEach((file) => {
         formData.append("files[]", file);
       });
 
-      // Add any other data required (like staff_email if needed)
       formData.append("staff_email", "ta1@example.com");
 
       try {
         await axios.post(
-          // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`,
           BATCH_UPLOAD_SUBMISSIONS(unitCode, projectName),
           formData,
           {
@@ -103,7 +101,6 @@ export default function AssignmentDashboard({
         console.error("Error generating questions", err);
         setError("Failed to generate questions.");
         
-        // Check if error response contains a specific error message from the server
         if (err.response && err.response.data && err.response.data.error) {
           window.alert(`Error: ${err.response.data.error}`);
         } else {
@@ -114,7 +111,18 @@ export default function AssignmentDashboard({
       setError("Please select at least one submission.");
     }
   };
-  
+
+  // Fetch the question template data when opening the View Template popup
+  const handleViewTemplate = async () => {
+    try {
+      const response = await axios.get(GET_QUESTIONS_TEMPLATE(unitCode, projectName));
+      setQuestionTemplate(response.data);
+      setShowViewTemplatePopup(true);
+    } catch (err) {
+      console.error("Error fetching question template", err);
+      setError("Failed to fetch question template.");
+    }
+  };
 
   // Function to reset template saved state
   const resetTemplateSaved = () => {
@@ -126,22 +134,22 @@ export default function AssignmentDashboard({
       <h1 className="text-2xl font-bold">{unitName} Dashboard</h1>
       <h2 className="text-xl mb-4">{decodeURIComponent(assignmentName)}</h2>
       <div className="mb-4">
-  <input
-    type="file"
-    accept=".pdf"
-    multiple // Allow multiple file selection
-    onChange={handleFileChange}
-    className="border rounded px-2 py-1 mr-2"
-  />
-  <button
-    onClick={handleUpload}
-    className="bg-green-500 text-white px-4 py-2 rounded"
-    disabled={loading}
-  >
-    {loading ? "Uploading..." : "Upload Submission"}
-  </button>
-  {error && <p className="text-red-500 mt-2">{error}</p>}
-</div>
+        <input
+          type="file"
+          accept=".pdf"
+          multiple
+          onChange={handleFileChange}
+          className="border rounded px-2 py-1 mr-2"
+        />
+        <button
+          onClick={handleUpload}
+          className="bg-green-500 text-white px-4 py-2 rounded"
+          disabled={loading}
+        >
+          {loading ? "Uploading..." : "Upload Submission"}
+        </button>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </div>
 
       <div className="flex justify-between items-center mt-4">
         <h3 className="text-lg font-semibold">Submissions</h3>
@@ -158,6 +166,12 @@ export default function AssignmentDashboard({
             {templateSaved ? "Edit Question Template" : "Add Question Template"}
           </button>
           <button
+            onClick={handleViewTemplate}
+            className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+          >
+            View Question Template
+          </button>
+          <button
             onClick={handleGenerateQuestions}
             className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
           >
@@ -165,6 +179,7 @@ export default function AssignmentDashboard({
           </button>
         </div>
       </div>
+
       {submissions.length === 0 ? (
         <p>No submissions uploaded yet.</p>
       ) : (
@@ -213,9 +228,7 @@ export default function AssignmentDashboard({
                   </td>
                   <td className="border px-4 py-2">
                     <Link
-                      href={
-                        `/dashboard/userDashboard/${unitCode}/${projectName}/${submission.submission_id}`
-                      }
+                      href={`/dashboard/userDashboard/${unitCode}/${projectName}/${submission.submission_id}`}
                     >{submission.submission_file_name}</Link>
                   </td>
                   <td className="border px-4 py-2">
@@ -227,6 +240,7 @@ export default function AssignmentDashboard({
           </table>
         </div>
       )}
+
       {showTemplate && (
         <QuestionTemplate
           onClose={() => {
@@ -236,8 +250,25 @@ export default function AssignmentDashboard({
           unitCode={unitCode}
           projectName={projectName}
         />
-      )}{" "}
-      {/* Render the overlay */}
+      )}
+
+      {/* View Question Template Popup */}
+      {showViewTemplatePopup && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-3/4 max-w-lg">
+            <h3 className="text-lg font-semibold mb-4">Question Template</h3>
+            <pre className="bg-gray-100 p-4 rounded-lg overflow-auto max-h-64">
+              {questionTemplate ? JSON.stringify(questionTemplate, null, 2) : "No template available."}
+            </pre>
+            <button
+              onClick={() => setShowViewTemplatePopup(false)}
+              className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

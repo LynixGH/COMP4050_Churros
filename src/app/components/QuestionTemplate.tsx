@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { POST_QUESTION_BANK, GET_QUESTION_BANK, POST_QUESTION_TEMPLATE } from '@/api';
+import { POST_QUESTION_BANK, GET_QUESTION_BANK, POST_QUESTION_TEMPLATE, } from '@/api';
 
 interface templateProps {
   onClose: () => void;
