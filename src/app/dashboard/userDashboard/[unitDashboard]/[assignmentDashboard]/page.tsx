@@ -22,7 +22,6 @@ export default function AssignmentDashboard({
   const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
   const [showTemplate, setShowTemplate] = useState<boolean>(false); // State to manage overlay visibility
   const [templateSaved, setTemplateSaved] = useState<boolean>(false); // State to track if the template has been saved
-  const [submissionsFetchedSuccessfully, setSubmissionsFetchedSuccessfully] = useState<boolean>(false); // New state
 
   useEffect(() => {
     fetchSubmissions();
@@ -31,15 +30,13 @@ export default function AssignmentDashboard({
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get(
+        // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`
         GET_SUBMISSIONS(unitCode, projectName)
       ); // Use dynamic URL
       setSubmissions(response.data.submission_files);
-      setSubmissionsFetchedSuccessfully(true); // Set to true when fetch is successful
-      setError(null); // Clear error if successful
     } catch (err) {
       console.error("Error fetching submissions", err);
       setError("Failed to fetch submissions.");
-      setSubmissionsFetchedSuccessfully(false); // Set to false when there's an error
     }
   };
 
@@ -64,6 +61,7 @@ export default function AssignmentDashboard({
 
       try {
         await axios.post(
+          // `http://3.25.103.58/units/${unitCode}/projects/${projectName}/files`,
           BATCH_UPLOAD_SUBMISSIONS(unitCode, projectName),
           formData,
           {
@@ -101,14 +99,22 @@ export default function AssignmentDashboard({
           }
         );
         console.log("Questions generated successfully:", response.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error generating questions", err);
         setError("Failed to generate questions.");
+        
+        // Check if error response contains a specific error message from the server
+        if (err.response && err.response.data && err.response.data.error) {
+          window.alert(`Error: ${err.response.data.error}`);
+        } else {
+          window.alert("An error occurred while generating questions.");
+        }
       }
     } else {
       setError("Please select at least one submission.");
     }
   };
+  
 
   // Function to reset template saved state
   const resetTemplateSaved = () => {
@@ -152,15 +158,12 @@ export default function AssignmentDashboard({
           >
             {templateSaved ? "Edit Question Template" : "Add Question Template"}
           </button>
-          {/* Conditionally render the "Generate Questions" button */}
-          {submissionsFetchedSuccessfully && (
-            <button
-              onClick={handleGenerateQuestions}
-              className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
-            >
-              Generate Questions
-            </button>
-          )}
+          <button
+            onClick={handleGenerateQuestions}
+            className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
+          >
+            Generate Questions
+          </button>
         </div>
       </div>
       {submissions.length === 0 ? (
@@ -211,10 +214,10 @@ export default function AssignmentDashboard({
                   </td>
                   <td className="border px-4 py-2">
                     <Link
-                      href={`/dashboard/userDashboard/${unitCode}/${projectName}/${submission.submission_id}`}
-                    >
-                      {submission.submission_file_name}
-                    </Link>
+                      href={
+                        `/dashboard/userDashboard/${unitCode}/${projectName}/${submission.submission_id}`
+                      }
+                    >{submission.submission_file_name}</Link>
                   </td>
                   <td className="border px-4 py-2">
                     {submission.submission_status}
