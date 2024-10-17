@@ -12,12 +12,6 @@ const menuItems = [
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
-          icon: "/subject.png",
-          label: "Subjects",
-          href: "http://localhost:3000/dashboard/userDashboard",
-          visible: ["admin"],
-        },
-        {
           icon: "/assignment.png",
           label: "Rubric",
           href: "http://localhost:3000/dashboard/rubricGen",
