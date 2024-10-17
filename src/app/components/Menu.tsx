@@ -25,8 +25,8 @@ const menuItems = [
         
         { //CHANGE FOR DARKMODE TOGGLE BUTTON
             
-          icon: "/setting.png",
-          label: "Settings",
+          icon: "/Dark Mode.png",
+          label: "Placeholder for DarkMode",
           href: "/settings",
           visible: ["admin", "teacher", "student", "parent"],
         },
