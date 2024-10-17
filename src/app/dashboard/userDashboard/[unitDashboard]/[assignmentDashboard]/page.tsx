@@ -125,25 +125,24 @@ export default function AssignmentDashboard({
     <div className="p-4">
       <h1 className="text-2xl font-bold">{unitName} Dashboard</h1>
       <h2 className="text-xl mb-4">{decodeURIComponent(assignmentName)}</h2>
-      {submissions.length === 0 ? (
-        <div className="mb-4">
-          <input
-            type="file"
-            accept=".pdf"
-            multiple // Allow multiple file selection
-            onChange={handleFileChange}
-            className="border rounded px-2 py-1 mr-2"
-          />
-          <button
-            onClick={handleUpload}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-            disabled={loading}
-          >
-            {loading ? "Uploading..." : "Upload Submission"}
-          </button>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-        </div>
-      ) : null}
+      <div className="mb-4">
+  <input
+    type="file"
+    accept=".pdf"
+    multiple // Allow multiple file selection
+    onChange={handleFileChange}
+    className="border rounded px-2 py-1 mr-2"
+  />
+  <button
+    onClick={handleUpload}
+    className="bg-green-500 text-white px-4 py-2 rounded"
+    disabled={loading}
+  >
+    {loading ? "Uploading..." : "Upload Submission"}
+  </button>
+  {error && <p className="text-red-500 mt-2">{error}</p>}
+</div>
+
       <div className="flex justify-between items-center mt-4">
         <h3 className="text-lg font-semibold">Submissions</h3>
         <div>
