@@ -1,5 +1,3 @@
-/* Student Upload CSV */
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { POST_STUDENTS } from '@/api';
@@ -11,7 +9,7 @@ interface UploadModalProps {
   unit_code: string;
 }
 
-const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, unit_code}) => {
+const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, unit_code }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +65,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, un
   };
 
   const handleClick = () => {
-    const inputElement = document.getElementById('file-input');
+    const inputElement = document.getElementById('file-input') as HTMLInputElement;
     if (inputElement) {
       inputElement.click(); // Trigger the file input dialog
     }
@@ -112,7 +110,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, un
 };
 
 // Inline styles for the modal
-const styles = {
+const styles: { [key: string]: React.CSSProperties } = {
   modalOverlay: {
     position: 'fixed',
     top: 0,
