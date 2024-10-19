@@ -81,7 +81,6 @@ const RubricGen = () => {
     }
   };
   
-
   // Fetch all rubrics from the API
   useEffect(() => {
     const fetchAllRubrics = async () => {
@@ -123,50 +122,42 @@ const RubricGen = () => {
   };
 
   // Helper function to render the rubric table based on the criteria and grade descriptions
-// Define the Criterion interface
-interface Criterion {
-  criteria_name: string;
-  criteria_description: string; // Include other relevant properties here
-}
+  const renderRubricTable = (rubricData: any) => {
+    if (!rubricData || !rubricData.grade_descriptors) {
+      return <p>No rubric data available</p>;
+    }
 
-// The renderRubricTable function
-const renderRubricTable = (rubricData: any) => {
-  if (!rubricData || !rubricData.grade_descriptors) {
-    return <p>No rubric data available</p>;
-  }
+    const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
+    const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
+    
+    // Define criteria with the correct type
+    const criteria: Criterion[] = rubricData.grade_descriptors[grades[0]].criterion; 
 
-  const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
-  const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
-  
-  // Define criteria with the correct type
-  const criteria: Criterion[] = rubricData.grade_descriptors[grades[0]].criterion; 
-
-  return (
-    <table className="rubric-table">
-      <thead>
-        <tr>
-          <th>Criterion</th>
-          {grades.map((grade) => (
-            <th key={grade}>{grade.replace('_', ' ').toUpperCase()}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {criteria.map((criterion, index) => (
-          <tr key={index}>
-            <td>{criterion.criteria_name}</td>
+    return (
+      <table className="rubric-table">
+        <thead>
+          <tr>
+            <th>Criterion</th>
             {grades.map((grade) => (
-              <td key={grade}>
-                {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
-              </td>
+              <th key={grade}>{grade.replace('_', ' ').toUpperCase()}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
-
+        </thead>
+        <tbody>
+          {criteria.map((criterion, index) => (
+            <tr key={index}>
+              <td>{criterion.criteria_name}</td>
+              {grades.map((grade) => (
+                <td key={grade}>
+                  {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
 
   const handleExport = async (rubricId: string, format: 'PDF' | 'XLS') => {
     try {
@@ -174,9 +165,9 @@ const renderRubricTable = (rubricData: any) => {
 
       // Set the export endpoint based on the format
       if (format === 'PDF') {
-        exportEndpoint = GET_PDF_RUBRIC(rubricId); // Future endpoint for PDF export
+        exportEndpoint = GET_PDF_RUBRIC(Number(rubricId)); // Convert to number here
       } else if (format === 'XLS') {
-        exportEndpoint = GET_XLS_RUBRIC(rubricId); // Future endpoint for XLS export
+        exportEndpoint = GET_XLS_RUBRIC(Number(rubricId)); // Convert to number here
       }
 
       // Make the GET request to fetch the export file
