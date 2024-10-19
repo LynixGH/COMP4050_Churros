@@ -22,19 +22,28 @@ interface Criterion {
   criteria_description: string; // Include other relevant properties here
 }
 
+// Define the ExistingRubric interface
+interface ExistingRubric {
+  rubric_id: number | null;
+  rubric_title: string;
+  ulo_list: any; // Replace 'any' with the actual type if known
+  grade_descriptors: any; // Replace 'any' with the actual type if known
+  // Add other properties as necessary
+}
+
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [rubrics, setRubrics] = useState<Rubric[]>([]); // State to hold the list of rubrics
   const [expandedRubricId, setExpandedRubricId] = useState<string | null>(null); // To track which rubric is expanded for detailed view
   const [detailedRubrics, setDetailedRubrics] = useState<{ [key: string]: any }>({}); // Store detailed rubrics based on ID
-  const [editRubric, setEditRubric] = useState<Rubric | null>(null); // State for holding rubric to be edited
+  const [editRubric, setEditRubric] = useState<ExistingRubric | null>(null); // State for holding rubric to be edited
 
   const handleOpenCreatePopup = () => {
     setIsCreatePopupOpen(true);
   };
 
-  const handleOpenEditPopup = (rubric: Rubric) => { // Type rubric parameter
+  const handleOpenEditPopup = (rubric: ExistingRubric) => { // Type rubric parameter
     console.log('Opening edit popup for rubric:', rubric);
     setEditRubric(rubric);
     setIsEditPopupOpen(true);
@@ -47,11 +56,22 @@ const RubricGen = () => {
     setIsCreatePopupOpen(false);
   };
 
-  const handleCloseEditPopup = (updatedRubric: Rubric | null) => {
+  const mapExistingRubricToRubric = (existingRubric: ExistingRubric): Rubric => {
+    return {
+      rubric_id: existingRubric.rubric_id?.toString() || '', // Convert to string if necessary
+      rubric_title: existingRubric.rubric_title,
+      created_by: '', // Set or fetch the created_by value if needed
+      rubric_generation_status: '', // Set or fetch the rubric_generation_status if needed
+      // Include other properties from ExistingRubric that are relevant
+    };
+  };
+
+  const handleCloseEditPopup = (updatedRubric: ExistingRubric | null) => {
     if (updatedRubric) {
+      const mappedRubric = mapExistingRubricToRubric(updatedRubric);
       setRubrics((prevRubrics) =>
         prevRubrics.map((rubric) =>
-          rubric.rubric_id === updatedRubric.rubric_id ? updatedRubric : rubric
+          rubric.rubric_id === mappedRubric.rubric_id ? mappedRubric : rubric
         )
       );
     }
@@ -202,7 +222,6 @@ const RubricGen = () => {
     }
   };
   
-
   return (
     <div className="rubric-dashboard">
       <button onClick={handleOpenCreatePopup}>Create New Rubric</button>
