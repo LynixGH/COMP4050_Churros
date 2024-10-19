@@ -55,7 +55,8 @@ const RubricGen = () => {
   // Delete rubric functionality
   const handleDeleteRubric = async (rubricId: string) => {
     try {
-      const response = await axios.delete(DEL_RUBRIC(rubricId));
+      // If DEL_RUBRIC expects a number, convert rubricId to number
+      const response = await axios.delete(DEL_RUBRIC(Number(rubricId)));
   
       if (response.status === 200) {
         alert(`Rubric with ID: ${rubricId} successfully deleted.`);
@@ -74,6 +75,7 @@ const RubricGen = () => {
       alert('Error deleting rubric. Please try again.');
     }
   };
+  
 
   // Fetch all rubrics from the API
   useEffect(() => {
