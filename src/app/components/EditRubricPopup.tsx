@@ -1,11 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '@/app/styles/EditRubricPopup.css'; // Create a CSS file specific to Edit functionality
+import '@/app/styles/EditRubricPopup.css'; // Make sure the CSS file is created and styled accordingly
 import { UPDATE_RUBRIC } from '@/api';
 
-const EditRubricPopup = ({ onClose, existingRubric }) => {
-  // Ensure rubric_id is explicitly initialized from existingRubric
-  const [rubric, setRubric] = useState({
+// Define an interface for the component's props
+interface Ulo {
+  ulo_item: string;
+}
+
+interface Criterion {
+  criteria_name: string;
+  criteria_description: string;
+}
+
+interface GradeDescriptor {
+  mark_min: number;
+  mark_max: number;
+  criterion: Criterion[];
+}
+
+interface ExistingRubric {
+  rubric_id: number | null;
+  rubric_title: string;
+  ulo_list: Ulo[];
+  grade_descriptors: {
+    [key: string]: GradeDescriptor;
+  };
+}
+
+interface EditRubricPopupProps {
+  onClose: (updatedRubric: ExistingRubric | null) => void;
+  existingRubric: ExistingRubric | null;
+}
+
+const EditRubricPopup: React.FC<EditRubricPopupProps> = ({ onClose, existingRubric }) => {
+  const [rubric, setRubric] = useState<ExistingRubric>({
     rubric_id: existingRubric?.rubric_id || null,  // Ensure rubric_id is present
     rubric_title: existingRubric?.rubric_title || '',
     ulo_list: existingRubric?.ulo_list || [],  // Ensure ulo_list is initialized
@@ -14,18 +43,16 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
 
   useEffect(() => {
     if (existingRubric) {
-      console.log('Existing rubric in edit popup:', existingRubric); // Log to verify rubric_id presence
       setRubric({
-        rubric_id: existingRubric?.rubric_id || null,  // Explicitly set rubric_id again
-        rubric_title: existingRubric?.rubric_title || '',
-        ulo_list: existingRubric?.ulo_list || [],
-        grade_descriptors: existingRubric?.grade_descriptors || {},
+        rubric_id: existingRubric.rubric_id || null,
+        rubric_title: existingRubric.rubric_title || '',
+        ulo_list: existingRubric.ulo_list || [],
+        grade_descriptors: existingRubric.grade_descriptors || {},
       });
     }
   }, [existingRubric]);
 
-  // Handle input changes for rubric title
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRubric((prevRubric) => ({
       ...prevRubric,
@@ -33,65 +60,76 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
     }));
   };
 
-  // Handle ULO changes
-  const handleUloChange = (index, value) => {
+  const handleUloChange = (index: number, value: string) => {
     const updatedUlos = [...rubric.ulo_list];
     updatedUlos[index].ulo_item = value;
     setRubric((prevRubric) => ({ ...prevRubric, ulo_list: updatedUlos }));
   };
 
-  // Handle changes in Grade Descriptors
-  const handleDescriptorChange = (grade, name, value) => {
+  const handleDescriptorChange = (
+    grade: string,
+    name: keyof Omit<GradeDescriptor, 'criterion'>, // Only handle 'mark_min' and 'mark_max' here
+    value: string | number
+  ) => {
     const updatedDescriptors = { ...rubric.grade_descriptors };
-    updatedDescriptors[grade][name] = value;
-    setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
+  
+    // Ensure we cast the value correctly depending on the field
+    if (name === 'mark_min' || name === 'mark_max') {
+      updatedDescriptors[grade][name] = typeof value === 'string' ? parseInt(value) : value; // Ensure it's a number
+    }
+  
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      grade_descriptors: updatedDescriptors,
+    }));
   };
+  
 
-  // Handle changes in Criteria within Grade Descriptors
-  const handleCriterionChange = (grade, criterionIndex, name, value) => {
+  const handleCriterionChange = (grade: string, criterionIndex: number, name: keyof Criterion, value: string) => {
     const updatedDescriptors = { ...rubric.grade_descriptors };
     updatedDescriptors[grade].criterion[criterionIndex][name] = value;
     setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
-  // Add/Remove ULOs
-  const addUlo = () => setRubric((prevRubric) => ({
-    ...prevRubric,
-    ulo_list: [...prevRubric.ulo_list, { ulo_item: '' }]
-  }));
+  const addUlo = () => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      ulo_list: [...prevRubric.ulo_list, { ulo_item: '' }],
+    }));
+  };
 
-  const removeUlo = (index) => setRubric((prevRubric) => ({
-    ...prevRubric,
-    ulo_list: prevRubric.ulo_list.filter((_, i) => i !== index)
-  }));
+  const removeUlo = (index: number) => {
+    setRubric((prevRubric) => ({
+      ...prevRubric,
+      ulo_list: prevRubric.ulo_list.filter((_, i) => i !== index),
+    }));
+  };
 
-  // Add/Remove Criteria inside a specific Grade Descriptor
-  const addCriterion = (grade) => {
+  const addCriterion = (grade: string) => {
     const updatedDescriptors = { ...rubric.grade_descriptors };
     updatedDescriptors[grade].criterion.push({ criteria_name: '', criteria_description: '' });
     setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
-  const removeCriterion = (grade, criterionIndex) => {
+  const removeCriterion = (grade: string, criterionIndex: number) => {
     const updatedDescriptors = { ...rubric.grade_descriptors };
     updatedDescriptors[grade].criterion = updatedDescriptors[grade].criterion.filter((_, i) => i !== criterionIndex);
     setRubric((prevRubric) => ({ ...prevRubric, grade_descriptors: updatedDescriptors }));
   };
 
-  // Submit updated rubric using PUT request
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (!rubric.rubric_id) {
-      console.error('rubric_id is missing');  // Log error if missing
+      console.error('rubric_id is missing');
       return;
     }
-  
+
     try {
-      const response = await axios.put(UPDATE_RUBRIC(rubric.rubric_id), rubric);  // Use the rubric_id dynamically
+      const response = await axios.put(UPDATE_RUBRIC(rubric.rubric_id), rubric);
       if (response.status === 200) {
         alert('Rubric updated successfully!');
-        onClose(rubric);  // Pass updated rubric back to parent component after successful update
+        onClose(rubric);
         window.location.reload();
       }
     } catch (error) {
@@ -116,7 +154,7 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
           />
 
           <h3>Unit Learning Outcomes (ULOs)</h3>
-          {rubric.ulo_list && rubric.ulo_list.length > 0 ? (
+          {rubric.ulo_list.length > 0 ? (
             rubric.ulo_list.map((ulo, index) => (
               <div key={index} className="dynamic-list-item">
                 <textarea
@@ -124,7 +162,11 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
                   onChange={(e) => handleUloChange(index, e.target.value)}
                   required
                 />
-                <button type="button" className="remove-button" onClick={() => removeUlo(index)}>
+                <button
+                  type="button"
+                  className="remove-button"
+                  onClick={() => removeUlo(index)}
+                >
                   Remove ULO
                 </button>
               </div>
@@ -145,7 +187,7 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
               <input
                 type="number"
                 value={descriptor.mark_min}
-                onChange={(e) => handleDescriptorChange(grade, 'mark_min', e.target.value)}
+                onChange={(e) => handleDescriptorChange(grade, 'mark_min', parseInt(e.target.value))}
                 required
               />
 
@@ -153,7 +195,7 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
               <input
                 type="number"
                 value={descriptor.mark_max}
-                onChange={(e) => handleDescriptorChange(grade, 'mark_max', e.target.value)}
+                onChange={(e) => handleDescriptorChange(grade, 'mark_max', parseInt(e.target.value))}
                 required
               />
 
@@ -174,7 +216,12 @@ const EditRubricPopup = ({ onClose, existingRubric }) => {
                     onChange={(e) => handleCriterionChange(grade, cIndex, 'criteria_description', e.target.value)}
                     required
                   />
-                  <button type="button" onClick={() => removeCriterion(grade, cIndex)}>Remove Criterion</button>
+                  <button
+                    type="button"
+                    onClick={() => removeCriterion(grade, cIndex)}
+                  >
+                    Remove Criterion
+                  </button>
                 </div>
               ))}
               <button type="button" onClick={() => addCriterion(grade)}>Add Criterion</button>
