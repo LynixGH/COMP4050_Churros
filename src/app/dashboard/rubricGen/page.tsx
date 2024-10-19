@@ -102,7 +102,7 @@ const RubricGen = () => {
   
     if (!detailedRubrics[rubricId]) {
       try {
-        const response = await axios.get(GET_RUBRIC(rubricId));
+        const response = await axios.get(GET_RUBRIC(Number(rubricId)));
         console.log('Fetched rubric details:', response.data);
         setDetailedRubrics((prevDetailedRubrics) => ({
           ...prevDetailedRubrics,
