@@ -15,6 +15,7 @@ interface Rubric {
   rubric_generation_status: string;
   // Add other properties as needed
 }
+
 // Define the Criterion interface
 interface Criterion {
   criteria_name: string;
@@ -60,7 +61,6 @@ const RubricGen = () => {
   // Delete rubric functionality
   const handleDeleteRubric = async (rubricId: string) => {
     try {
-      // If DEL_RUBRIC expects a number, convert rubricId to number
       const response = await axios.delete(DEL_RUBRIC(Number(rubricId)));
   
       if (response.status === 200) {
@@ -201,7 +201,6 @@ const RubricGen = () => {
       alert(`Failed to export rubric as ${format}. Please try again.`);
     }
   };
-  
 
   return (
     <div className="rubric-dashboard">
