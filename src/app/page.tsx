@@ -1,6 +1,10 @@
+import SignInForm from '@/app/components/SignInForm';
+
 const Homepage = () => {
   return (
-    <div className=''>login page</div>
+    <div>
+            <SignInForm />
+        </div>
   )
 }
 
