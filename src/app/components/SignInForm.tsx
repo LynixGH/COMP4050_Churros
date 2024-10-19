@@ -1,6 +1,7 @@
 // components/SignInForm.jsx
 import React from 'react';
 import Head from 'next/head';
+import Link from 'next/link'
 
 const SignInForm = () => {
     return (
@@ -96,12 +97,14 @@ const SignInForm = () => {
                                             name="password"
                                         />
                                     </div>
+                                    <Link href="/userDashboard">
                                     <button
                                         className="whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 mt-2 flex h-[unset] w-full items-center justify-center rounded-lg px-4 py-4 text-sm font-medium"
                                         type="submit"
                                     >
                                         Sign in
                                     </button>
+                                    </Link>
                                 </div>
                             </form>
                             <p>
