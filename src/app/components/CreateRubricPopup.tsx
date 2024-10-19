@@ -116,12 +116,22 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
     fieldIndex: number
   ) => {
     const updatedCriteria = [...rubric.criteria];
-    updatedCriteria[index][field] = updatedCriteria[index][field].filter((_, i) => i !== fieldIndex);
+  
+    // Check if the field is an array before using filter
+    if (Array.isArray(updatedCriteria[index][field])) {
+      updatedCriteria[index][field] = (updatedCriteria[index][field] as string[]).filter(
+        (_, i) => i !== fieldIndex
+      ) as any; // This ensures we cast it to the correct type
+    }
+  
     setRubric((prevRubric) => ({
       ...prevRubric,
       criteria: updatedCriteria,
     }));
   };
+  
+  
+  
 
   const removeULO = (uloIndex: number) => {
     setRubric((prevRubric) => ({
