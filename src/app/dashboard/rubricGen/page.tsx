@@ -15,6 +15,11 @@ interface Rubric {
   rubric_generation_status: string;
   // Add other properties as needed
 }
+// Define the Criterion interface
+interface Criterion {
+  criteria_name: string;
+  criteria_description: string; // Include other relevant properties here
+}
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
@@ -118,40 +123,50 @@ const RubricGen = () => {
   };
 
   // Helper function to render the rubric table based on the criteria and grade descriptions
-  const renderRubricTable = (rubricData: any) => {
-    if (!rubricData || !rubricData.grade_descriptors) {
-      return <p>No rubric data available</p>;
-    }
+// Define the Criterion interface
+interface Criterion {
+  criteria_name: string;
+  criteria_description: string; // Include other relevant properties here
+}
 
-    const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
-    const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
-    const criteria = rubricData.grade_descriptors[grades[0]].criterion;
+// The renderRubricTable function
+const renderRubricTable = (rubricData: any) => {
+  if (!rubricData || !rubricData.grade_descriptors) {
+    return <p>No rubric data available</p>;
+  }
 
-    return (
-      <table className="rubric-table">
-        <thead>
-          <tr>
-            <th>Criterion</th>
+  const orderedGrades = ['fail', 'pass_', 'credit', 'distinction', 'high_distinction'];
+  const grades = orderedGrades.filter((grade) => rubricData.grade_descriptors[grade]);
+  
+  // Define criteria with the correct type
+  const criteria: Criterion[] = rubricData.grade_descriptors[grades[0]].criterion; 
+
+  return (
+    <table className="rubric-table">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          {grades.map((grade) => (
+            <th key={grade}>{grade.replace('_', ' ').toUpperCase()}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {criteria.map((criterion, index) => (
+          <tr key={index}>
+            <td>{criterion.criteria_name}</td>
             {grades.map((grade) => (
-              <th key={grade}>{grade.replace('_', ' ').toUpperCase()}</th>
+              <td key={grade}>
+                {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
+              </td>
             ))}
           </tr>
-        </thead>
-        <tbody>
-          {criteria.map((criterion, index) => (
-            <tr key={index}>
-              <td>{criterion.criteria_name}</td>
-              {grades.map((grade) => (
-                <td key={grade}>
-                  {rubricData.grade_descriptors[grade].criterion[index].criteria_description}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
 
   const handleExport = async (rubricId: string, format: 'PDF' | 'XLS') => {
     try {
