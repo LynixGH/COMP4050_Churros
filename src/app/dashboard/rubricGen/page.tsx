@@ -3,36 +3,45 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '@/app/styles/rubricGen.css';
-import CreateRubricPopup from '@/app/components/CreateRubricPopup'; // For creating rubrics
-import EditRubricPopup from '@/app/components/EditRubricPopup'; // For editing rubrics
+import CreateRubricPopup from '@/app/components/CreateRubricPopup'; 
+import EditRubricPopup from '@/app/components/EditRubricPopup'; 
 import { GET_RUBRIC, GET_ALL_RUBRICS, DEL_RUBRIC, GET_PDF_RUBRIC, GET_XLS_RUBRIC } from '@/api';
+
+// Define the Rubric interface
+interface Rubric {
+  rubric_id: string; // Assuming ID is a string; change to number if applicable
+  rubric_title: string;
+  created_by: string;
+  rubric_generation_status: string;
+  // Add other properties as needed
+}
 
 const RubricGen = () => {
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
-  const [rubrics, setRubrics] = useState([]); // State to hold the list of rubrics
-  const [expandedRubricId, setExpandedRubricId] = useState(null); // To track which rubric is expanded for detailed view
-  const [detailedRubrics, setDetailedRubrics] = useState({}); // Store detailed rubrics based on ID
-  const [editRubric, setEditRubric] = useState(null); // State for holding rubric to be edited
+  const [rubrics, setRubrics] = useState<Rubric[]>([]); // State to hold the list of rubrics
+  const [expandedRubricId, setExpandedRubricId] = useState<string | null>(null); // To track which rubric is expanded for detailed view
+  const [detailedRubrics, setDetailedRubrics] = useState<{ [key: string]: any }>({}); // Store detailed rubrics based on ID
+  const [editRubric, setEditRubric] = useState<Rubric | null>(null); // State for holding rubric to be edited
 
   const handleOpenCreatePopup = () => {
     setIsCreatePopupOpen(true);
   };
 
-  const handleOpenEditPopup = (rubric) => {
+  const handleOpenEditPopup = (rubric: Rubric) => { // Type rubric parameter
     console.log('Opening edit popup for rubric:', rubric);
     setEditRubric(rubric);
     setIsEditPopupOpen(true);
   };
 
-  const handleCloseCreatePopup = (newRubric) => {
+  const handleCloseCreatePopup = (newRubric: Rubric | null) => {
     if (newRubric) {
       setRubrics((prevRubrics) => [...prevRubrics, newRubric]); // Add new rubric to the list
     }
     setIsCreatePopupOpen(false);
   };
 
-  const handleCloseEditPopup = (updatedRubric) => {
+  const handleCloseEditPopup = (updatedRubric: Rubric | null) => {
     if (updatedRubric) {
       setRubrics((prevRubrics) =>
         prevRubrics.map((rubric) =>
@@ -44,7 +53,7 @@ const RubricGen = () => {
   };
 
   // Delete rubric functionality
-  const handleDeleteRubric = async (rubricId) => {
+  const handleDeleteRubric = async (rubricId: string) => {
     try {
       const response = await axios.delete(DEL_RUBRIC(rubricId));
   
@@ -83,7 +92,7 @@ const RubricGen = () => {
   }, []);
 
   // Fetch detailed rubric data when the user clicks to expand it
-  const fetchRubricDetails = async (rubricId) => {
+  const fetchRubricDetails = async (rubricId: string) => {
     if (expandedRubricId === rubricId) {
       setExpandedRubricId(null);
       return;
@@ -107,7 +116,7 @@ const RubricGen = () => {
   };
 
   // Helper function to render the rubric table based on the criteria and grade descriptions
-  const renderRubricTable = (rubricData) => {
+  const renderRubricTable = (rubricData: any) => {
     if (!rubricData || !rubricData.grade_descriptors) {
       return <p>No rubric data available</p>;
     }
@@ -142,44 +151,43 @@ const RubricGen = () => {
     );
   };
 
-  const handleExport = async (rubricId, format) => {
+  const handleExport = async (rubricId: string, format: 'PDF' | 'XLS') => {
     try {
       let exportEndpoint;
-      
+
       // Set the export endpoint based on the format
       if (format === 'PDF') {
         exportEndpoint = GET_PDF_RUBRIC(rubricId); // Future endpoint for PDF export
       } else if (format === 'XLS') {
         exportEndpoint = GET_XLS_RUBRIC(rubricId); // Future endpoint for XLS export
       }
-  
+
       // Make the GET request to fetch the export file
       const response = await axios.get(exportEndpoint, {
         responseType: 'blob', // Ensure the response is treated as a file (blob)
       });
-  
+
       // Create a URL for the blob and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-  
+
       // Set filename for download based on format
       link.setAttribute('download', `rubric_${rubricId}.${format.toLowerCase()}`);
-      
+
       // Append link to the document and trigger the download
       document.body.appendChild(link);
       link.click();
-  
+
       // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-  
+
     } catch (error) {
       console.error(`Error exporting rubric ID ${rubricId} as ${format}`, error);
       alert(`Failed to export rubric as ${format}. Please try again.`);
     }
   };
-  
 
   return (
     <div className="rubric-dashboard">
