@@ -5,7 +5,7 @@ import { GENERATE_RUBRIC } from '@/api';
 
 // Define an interface for the props
 interface CreateRubricPopupProps {
-  onClose: () => void;
+  onClose: (newRubric: any | null) => void; // Update to accept a new rubric or null
   existingRubric?: {
     staff_email?: string;
     assessment_description?: string;
@@ -129,9 +129,6 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
       criteria: updatedCriteria,
     }));
   };
-  
-  
-  
 
   const removeULO = (uloIndex: number) => {
     setRubric((prevRubric) => ({
@@ -147,8 +144,8 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
       const response = await axios.post(GENERATE_RUBRIC, rubric);
       if (response.status === 200) {
         alert('Rubric submitted successfully!');
-        onClose(); // Close the form after submission
-        window.location.reload();
+        onClose(rubric); // Pass the new rubric back to the parent component
+        window.location.reload(); // Refresh page after submission (optional)
       }
     } catch (error) {
       console.error('Error submitting rubric:', error);
@@ -316,78 +313,77 @@ const CreateRubricPopup: React.FC<CreateRubricPopupProps> = ({
               {criterion.knowledge?.map((knowledgeItem, kIndex) => (
                 <div key={kIndex} className="field-row">
                   <input
-                   
-                   type="text"
-                   value={knowledgeItem}
-                   onChange={(e) => {
-                     const updatedKnowledge = [...rubric.criteria[index].knowledge];
-                     updatedKnowledge[kIndex] = e.target.value;
-                     const updatedCriteria = [...rubric.criteria];
-                     updatedCriteria[index].knowledge = updatedKnowledge;
-                     setRubric({ ...rubric, criteria: updatedCriteria });
-                   }}
-                   disabled={loading}
-                 />
-                 <button
-                   type="button"
-                   className="remove-btn-small"
-                   onClick={() => removeFieldFromCriterion(index, 'knowledge', kIndex)}
-                   disabled={loading}
-                 >
-                   Remove Knowledge
-                 </button>
-               </div>
-             ))}
-             <button
-               type="button"
-               onClick={() => addFieldToCriterion(index, 'knowledge')}
-               disabled={loading}
-             >
-               Add Knowledge
-             </button>
-           </div>
-         ))}
-         <button type="button" onClick={addCriterion} disabled={loading}>
-           Add Criterion
-         </button>
+                    type="text"
+                    value={knowledgeItem}
+                    onChange={(e) => {
+                      const updatedKnowledge = [...rubric.criteria[index].knowledge];
+                      updatedKnowledge[kIndex] = e.target.value;
+                      const updatedCriteria = [...rubric.criteria];
+                      updatedCriteria[index].knowledge = updatedKnowledge;
+                      setRubric({ ...rubric, criteria: updatedCriteria });
+                    }}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="remove-btn-small"
+                    onClick={() => removeFieldFromCriterion(index, 'knowledge', kIndex)}
+                    disabled={loading}
+                  >
+                    Remove Knowledge
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addFieldToCriterion(index, 'knowledge')}
+                disabled={loading}
+              >
+                Add Knowledge
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={addCriterion} disabled={loading}>
+            Add Criterion
+          </button>
 
-         <h3>Unit Learning Outcomes (ULOs)</h3>
-         {rubric.ulos?.map((ulo, index) => (
-           <div key={index} className="field-row">
-             <input
-               type="text"
-               value={ulo}
-               onChange={(e) => {
-                 const updatedUlos = [...rubric.ulos];
-                 updatedUlos[index] = e.target.value;
-                 setRubric({ ...rubric, ulos: updatedUlos });
-               }}
-               disabled={loading}
-             />
-             <button
-               type="button"
-               className="remove-btn-small"
-               onClick={() => removeULO(index)}
-               disabled={loading}
-             >
-               Remove ULO
-             </button>
-           </div>
-         ))}
-         <button type="button" onClick={addULO} disabled={loading}>
-           Add ULO
-         </button>
+          <h3>Unit Learning Outcomes (ULOs)</h3>
+          {rubric.ulos?.map((ulo, index) => (
+            <div key={index} className="field-row">
+              <input
+                type="text"
+                value={ulo}
+                onChange={(e) => {
+                  const updatedUlos = [...rubric.ulos];
+                  updatedUlos[index] = e.target.value;
+                  setRubric({ ...rubric, ulos: updatedUlos });
+                }}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="remove-btn-small"
+                onClick={() => removeULO(index)}
+                disabled={loading}
+              >
+                Remove ULO
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={addULO} disabled={loading}>
+            Add ULO
+          </button>
 
-         <button type="submit" disabled={loading}>
-           {loading ? 'Submitting...' : 'Submit'}
-         </button>
-         <button type="button" onClick={() => onClose()} disabled={loading}>
-           Cancel
-         </button>
-       </form>
-     </div>
-   </div>
- );
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit'}
+          </button>
+          <button type="button" onClick={() => onClose(null)} disabled={loading}>
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default CreateRubricPopup;

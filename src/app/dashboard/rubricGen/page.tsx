@@ -201,6 +201,7 @@ const RubricGen = () => {
       alert(`Failed to export rubric as ${format}. Please try again.`);
     }
   };
+  
 
   return (
     <div className="rubric-dashboard">
