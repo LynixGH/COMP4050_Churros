@@ -161,41 +161,47 @@ const RubricGen = () => {
 
   const handleExport = async (rubricId: string, format: 'PDF' | 'XLS') => {
     try {
-      let exportEndpoint;
-
+      let exportEndpoint: string | undefined;
+  
       // Set the export endpoint based on the format
       if (format === 'PDF') {
         exportEndpoint = GET_PDF_RUBRIC(Number(rubricId)); // Convert to number here
       } else if (format === 'XLS') {
         exportEndpoint = GET_XLS_RUBRIC(Number(rubricId)); // Convert to number here
       }
-
+  
+      // Check if exportEndpoint is defined before making the request
+      if (!exportEndpoint) {
+        throw new Error('Export endpoint is undefined');
+      }
+  
       // Make the GET request to fetch the export file
       const response = await axios.get(exportEndpoint, {
         responseType: 'blob', // Ensure the response is treated as a file (blob)
       });
-
+  
       // Create a URL for the blob and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-
+  
       // Set filename for download based on format
       link.setAttribute('download', `rubric_${rubricId}.${format.toLowerCase()}`);
-
+  
       // Append link to the document and trigger the download
       document.body.appendChild(link);
       link.click();
-
+  
       // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-
+  
     } catch (error) {
       console.error(`Error exporting rubric ID ${rubricId} as ${format}`, error);
       alert(`Failed to export rubric as ${format}. Please try again.`);
     }
   };
+  
 
   return (
     <div className="rubric-dashboard">
