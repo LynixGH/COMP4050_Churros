@@ -95,8 +95,8 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 }) => {
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-// Change this type to reflect that randomQuestions is an array of RandomQuestion objects
-const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); // Array of questions
+  // Change this type to reflect that randomQuestions is an array of RandomQuestion objects
+  const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); // Array of questions
 
 
   const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
@@ -157,7 +157,7 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
   };
 
   const handleSelectiveGenerate = async () => {
-
+    // Prepare the question type map and other flags (unchanged)
     const questionTypeMap: { [key: string]: string } = {
       analysis_and_evaluation: "Analysis and Evaluation",
       application_and_problem_solving: "Application and Problem Solving",
@@ -165,20 +165,15 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
       open_ended: "Open-ended",
     };
 
-
     const questionReasonArray = [];
     let hasSelectedQuestion = false;
     let allSelectedHaveReasons = true;
     let reasonWithoutSelection = false;
 
-    console.log()
-
-    for (let [category, questions] of Object.entries(
-      reviewData!.ai_questions
-    )) {
+    // Loop through current reviewData and gather selected questions and reasons (unchanged)
+    for (let [category, questions] of Object.entries(reviewData!.ai_questions)) {
       for (let [questionKey, questionText] of Object.entries(questions)) {
-        const isSelected =
-          selectedQuestions[category]?.[questionKey] || false;
+        const isSelected = selectedQuestions[category]?.[questionKey] || false;
         const reason = selectedReasons[category]?.[questionKey];
 
         if (isSelected) {
@@ -199,7 +194,7 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
       }
     }
 
-    // Check for failsafe conditions
+    // Validate and handle selection/reason errors (unchanged)
     if (!hasSelectedQuestion) {
       alert("Please select at least one question to regenerate.");
       return;
@@ -217,43 +212,46 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
       return;
     }
 
-    // Before sending, output the question_reason array for debugging
-    console.log("Question Reasons to be sent:", questionReasonArray);
-
-    // Prepare the payload
-    const payload = {
-      question_reason: questionReasonArray,
-    };
+    // Payload preparation and API calls (unchanged)
+    const payload = { question_reason: questionReasonArray };
 
     try {
-      // Send the POST request with the payload
-      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(
-        unitCode,
-        projectName,
-        submissionId
-      );
-      console.log("DEBUG - ", unitCode)
-
-      console.log("WORKING?", generateUrl)
+      const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
       await axios.post(generateUrl, payload);
 
       // Fetch updated questions after regeneration
       setLoading(true);
-
-
-      const response = await axios.get(
-        `${GET_GENERATED_QUESTIONS(submissionId)}`
-      );
-
-      console.log("AFTER CASE", response)
+      const response = await axios.get(`${GET_GENERATED_QUESTIONS(submissionId)}`);
 
       if (response.status === 200 && response.data) {
-        const data: ReviewData[] = response.data;
-        setReviewData(data[data.length - 1]);
+        const regeneratedData: ReviewData[] = response.data;
+        const newQuestions = regeneratedData[regeneratedData.length - 1].ai_questions;
 
-        console.log("Regenerated DATA", data)
+        // Focus: Structure Update Only - Replace regenerated questions
+        setReviewData((prevReviewData) => {
+          if (prevReviewData) {
+            const updatedQuestions = { ...prevReviewData.ai_questions };
 
-        // Clear selected reasons and selected questions after regeneration
+            // Only update the specific questions that were regenerated
+            for (const [category, questions] of Object.entries(newQuestions)) {
+              if (updatedQuestions[category]) {
+                for (const [questionKey, questionText] of Object.entries(questions)) {
+                  // Replace only the selected and regenerated questions
+                  updatedQuestions[category][questionKey] = questionText;
+                }
+              }
+            }
+
+            return {
+              ...prevReviewData,
+              ai_questions: updatedQuestions, // Update the structure only
+            };
+          } else {
+            return regeneratedData[regeneratedData.length - 1]; // Return new data if no previous exists
+          }
+        });
+
+        // Clear selections (unchanged)
         setSelectedReasons({});
         setSelectedQuestions({});
       } else {
@@ -265,6 +263,7 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
       setLoading(false);
     }
   };
+
 
   // Handle reason selection
   const handleReasonChange = (
@@ -371,34 +370,34 @@ const [randomQuestions, setRandomQuestions] = useState<RandomQuestion[]>([]); //
           </>
         )}
 
-{activeTab === "random" && (
-        <>
-          {/* Fetch Random Questions button for manual refresh */}
-          <button style={styles.randomButton} onClick={handleRandomButtonClick}>
-            Fetch Random Questions
-          </button>
+        {activeTab === "random" && (
+          <>
+            {/* Fetch Random Questions button for manual refresh */}
+            <button style={styles.randomButton} onClick={handleRandomButtonClick}>
+              Fetch Random Questions
+            </button>
 
-          {/* Render loading state or questions */}
-          {loading ? (
-            <p>Loading...</p>
-          ) : randomQuestions.length > 0 ? ( // Check if the array has questions
-            <table style={styles.table}>
-              <tbody>
-                {randomQuestions.map((questionObj, index) => (
-                  <tr
-                    key={index} // Use index or another unique identifier for each question
-                    style={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}
-                  >
-                    <td style={styles.questionText}>{questionObj.question}</td> {/* Render question text */}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No questions available.</p> // Display message if there are no questions
-          )}
-        </>
-      )}
+            {/* Render loading state or questions */}
+            {loading ? (
+              <p>Loading...</p>
+            ) : randomQuestions.length > 0 ? ( // Check if the array has questions
+              <table style={styles.table}>
+                <tbody>
+                  {randomQuestions.map((questionObj, index) => (
+                    <tr
+                      key={index} // Use index or another unique identifier for each question
+                      style={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}
+                    >
+                      <td style={styles.questionText}>{questionObj.question}</td> {/* Render question text */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No questions available.</p> // Display message if there are no questions
+            )}
+          </>
+        )}
 
 
 
