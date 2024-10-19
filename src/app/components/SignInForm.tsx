@@ -7,8 +7,8 @@ const SignInForm = () => {
     return (
         <>
   
-            <div className="flex flex-col justify-center items-center bg-white h-[50vh]">
-                <div className="mx-auto flex w-full flex-col justify-center px-5 md:max-w-[50%] lg:max-w-[50%] lg:px-6">
+            <div className="flex flex-col justify-center items-center bg-white h-[50vh] max-w">
+                <div className="mx-auto flex w-full flex-col justify-center px-5 md:max-w-[50%] lg:max-w-[100%] lg:px-6">
                     <a className="mt-10 w-fit text-zinc-950 dark:text-white" href="/">
                         <div className="flex w-fit items-center lg:pl-0 lg:pt-0 xl:pt-0">
                             {/* SVG for back link */}
