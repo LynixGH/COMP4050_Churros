@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '@/app/styles/ConvertMarkingGuidePopup.css';
+import { CONVERT_MARKING_GUIDE, UPLOAD_MARKING_GUIDE } from '@/api';
 
 interface ConvertMarkingGuidePopupProps {
   onClose: () => void; // Close the popup
@@ -8,7 +9,7 @@ interface ConvertMarkingGuidePopupProps {
 
 const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onClose }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [markingGuideId, setMarkingGuideId] = useState<string | null>(null); // Store the returned ID
+  const [markingGuideId, setMarkingGuideId] = useState<number | null>(null); // Store the returned ID
   const [ulos, setUlos] = useState<string[]>(['']);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +26,7 @@ const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onC
         formData.append('file', selectedFile);
         formData.append('staff_email', 'convener1@example.com'); // Hardcoded staff email
 
-        const uploadResponse = await axios.post('http://3.106.214.31/marking_guide', formData, {
+        const uploadResponse = await axios.post(UPLOAD_MARKING_GUIDE, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -89,11 +90,9 @@ const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onC
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        //`http://3.106.214.31/convert_marking_guide/${markingGuideId}`,
-        `http://3.106.214.31/convert_marking_guide/10`,
+      const response = await axios.post(CONVERT_MARKING_GUIDE(markingGuideId),
         {
-          staff_email: 'ta1@example.com', // Hardcoded staff email
+          staff_email: 'convener1@example.com', // Hardcoded staff email
           ulos,
         }
       );
