@@ -163,7 +163,7 @@ export default function AssignmentDashboard({
             }}
             className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
           >
-            {templateSaved ? "Edit Question Template" : "Add Question Template"}
+            {templateSaved ? "Edit Question Template" : "Question Template"}
           </button>
           <button
             onClick={handleViewTemplate}
