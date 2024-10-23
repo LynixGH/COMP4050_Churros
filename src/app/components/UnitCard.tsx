@@ -13,7 +13,7 @@ interface UnitProps {
 
 const UnitCard: React.FC<UnitProps> = ({ unit }) => {
   return (
-    <Link href={`/dashboard/userDashboard/${unit.unit_code}`} passHref>
+    <Link href={`/userDashboard/${unit.unit_code}`} passHref>
       <div className="unit-card">
         <h3>{unit.unit_code}</h3>
         <p>{unit.unit_name}</p>

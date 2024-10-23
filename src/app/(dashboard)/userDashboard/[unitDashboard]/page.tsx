@@ -58,7 +58,7 @@ export default function UnitDashboard({ params }: { params: { unitDashboard: str
     .catch(err => {
       console.error("Error fetching unit", err);
       setError('Failed to load unit');
-      window.location.href = '/dashboard/userDashboard';
+      window.location.href = '/userDashboard';
     });
 
   const handleCreateProject = (newProjectName: string) => {
