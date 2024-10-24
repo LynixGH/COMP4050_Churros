@@ -116,7 +116,7 @@ const Assignments: React.FC<Assignment> = ({
         <div key={assignment.project_id} style={styles.box}>
           {/* Wrapping only the project info in the Link */}
           <Link
-            href={`/dashboard/userDashboard/${unit_code}/${assignment.project_name}`}
+            href={`/userDashboard/${unit_code}/${assignment.project_name}`}
             passHref
           >
             <div style={styles.assignmentInfo}>

@@ -8,13 +8,13 @@ const menuItems = [
         {
           icon: "/home.png",
           label: "Home",
-          href: "http://localhost:3000/dashboard/userDashboard",
+          href: "/userDashboard",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
           icon: "/assignment.png",
           label: "Rubric",
-          href: "http://localhost:3000/dashboard/rubricGen",
+          href: "/rubricGen",
           visible: ["admin", "teacher", "student", "parent"],
         },
       ],
@@ -26,14 +26,14 @@ const menuItems = [
         { //CHANGE FOR DARKMODE TOGGLE BUTTON
             
           icon: "/Dark Mode.png",
-          label: "Placeholder for DarkMode",
+          label: "DarkMode",
           href: "/settings",
           visible: ["admin", "teacher", "student", "parent"],
         },
         {
           icon: "/logout.png",
           label: "Logout",
-          href: "/logout",
+          href: "/",
           visible: ["admin", "teacher", "student", "parent"],
         },
       ],
