@@ -1,16 +1,18 @@
 import ReviewQuestions from "@/app/components/ReviewQuestions";
-import UnitDashboard from "../../page";
 
+// Interface for the parameters expected in the dynamic route
 interface PageProps {
-  params: {
+  params: Promise<{
     questiondashboard: number;
     assignmentDashboard: string;
     unitDashboard: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
-  const { questiondashboard, assignmentDashboard, unitDashboard } = params;
+// Asynchronous page component
+export default async function Page({ params }: PageProps) {
+  // Await the resolved params object
+  const { questiondashboard, assignmentDashboard, unitDashboard } = await params;
 
   return (
     <ReviewQuestions
