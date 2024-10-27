@@ -1,6 +1,12 @@
 # COMP4050 VivaMQ Churros Frontend
 
-## Getting Started
+## Description
+
+This is the Github Repository of the COMP4050 2024 Session 2 Churros team in the Espana division. The code base is created using the next.js framework. It was worked on by Mark Ghaby, Thomas Bevan, Vivian Wu, Darrell Jun Zhen Lim & Keval Kaushalbhai Gandhi.
+
+This codebase provides the frontend to the Espana division's solution to the client issue proposed to us at the beginning of the semester. It ultimately provides the user interface to interact with the VivaMQ system which has authentication capabilities, the ability to create units and assignments for viva voce assignment creation, based on other students submissions. There is also the capabilities of creating a rubric for an assignment based on a description, criterions and ULOs, as well as the ability to convert an existing marking guide to a marking rubric. The true power comes from this all being powered by AI which was handled by the Capote team.
+
+## Build Instructions
 
 First, setup the node modules:
 ```bash
@@ -21,11 +27,17 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Third-Party Code Usage
 
-## Learn More
+The list of third-party code is as below:
 
-To learn more about Next.js, take a look at the following resources:
+* [Axios](https://axios-http.com/docs/intro)
+* [TailwindCSS] (https://tailwindcss.com/docs/installation)
 
-- [Lama Dev Youtube Channel](https://youtube.com/lamadev) 
-- [Next.js](https://nextjs.org/learn)
+## Acknowledgements
+
+We would like to acknowledge Asngar and Kate for putting the unit together as well as supervising and providing us guidance throughout the semester. We would also like to acknowledge, Carl, Luke and Matt for acting as clients for us to simulate real world experiences and give us the opporunity to learn from. Aditionally, we would like to acknowledge Suhaas Gambhir from the Capote team, Mifta Alam from the Cordoba team and Himanshi Garg from the Cordoba team in their contributions and assistance to the creation of this codebase. 
+
+## Codebase Description
+
+All source code can be found within the `/src` directory. Inside there is the `/components` directory which contains code for the menu component we call. There is also an `api.tsx` file which holds all the API constants we use to interact with the backend. There is also an `app` directory which is where the core functionality can be found. Here there is another `/components` directory which holds a lot of the shared components used throughout the app, there is the `(dashboard)` directory which nested inside (for the purposes of routing) holds the maindashbaord of the app, the rubric generation code for requirements 6.1 and 6.2, and the `/userDashboard` which nested inside of that holds the code for the viva voce generation functionality. More details can be found within the developer manual.
