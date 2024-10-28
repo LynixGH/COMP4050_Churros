@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios, {AxiosError} from 'axios';
 import '@/app/styles/ConvertMarkingGuidePopup.css';
 import { CONVERT_MARKING_GUIDE, UPLOAD_MARKING_GUIDE } from '@/api';
 
 interface ConvertMarkingGuidePopupProps {
   onClose: () => void; // Close the popup
-}
-
-// Define the structure of the expected error response
-interface ErrorResponse {
-  message: string;
 }
 
 const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onClose }) => {
@@ -50,19 +45,19 @@ const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onC
           console.error('Marking Guide ID not found in the response:', uploadResponse.data);
           alert('File uploaded, but failed to retrieve Marking Guide ID.');
         }
-      } catch (error: unknown) {
-        // Type guard to check if error is AxiosError
+      } catch (error) {
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError<ErrorResponse>; // Cast to AxiosError with ErrorResponse
-          const errorMessage = axiosError.response?.data?.message || 'File upload failed.';
-          console.error('Axios error response:', axiosError.response);
-          alert(`Error: ${errorMessage}`);
-        } else if (error instanceof Error) {
-          // Handle a general JavaScript error
-          console.error('Error during file upload:', error.message);
-          alert('An error occurred during file upload.');
+          if (error.response) {
+            console.error('Error response:', error.response);
+            alert(`Error: ${error.response.data.message || 'File upload failed.'}`);
+          } else if (error.request) {
+            console.error('No response from server:', error.request);
+            alert('No response from server. File upload failed.');
+          } else {
+            console.error('Error during file upload:', error.message);
+            alert('An error occurred during file upload.');
+          }
         } else {
-          // Handle an unknown error
           console.error('Unexpected error:', error);
           alert('An unexpected error occurred.');
         }
@@ -114,22 +109,9 @@ const ConvertMarkingGuidePopup: React.FC<ConvertMarkingGuidePopupProps> = ({ onC
         console.error('Submission failed with status:', response.status, response.data);
         alert('Submission failed. Please try again.');
       }
-    } catch (error: unknown) {
-      // Type guard to check if error is AxiosError
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError<ErrorResponse>; // Cast to AxiosError with ErrorResponse
-        const errorMessage = axiosError.response?.data?.message || 'Submission failed.';
-        console.error('Axios error response:', axiosError.response);
-        alert(`Error: ${errorMessage}`);
-      } else if (error instanceof Error) {
-        // Handle a general JavaScript error
-        console.error('Error during submission:', error.message);
-        alert('An error occurred during submission.');
-      } else {
-        // Handle an unknown error
-        console.error('Unexpected error:', error);
-        alert('An unexpected error occurred.');
-      }
+    } catch (error) {
+      console.error('Error submitting marking guide:', error);
+      alert('An error occurred during submission.');
     } finally {
       setLoading(false);
     }
