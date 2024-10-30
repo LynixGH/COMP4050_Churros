@@ -32,7 +32,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 The list of third-party code is as below:
 
 * [Axios](https://axios-http.com/docs/intro)
-* [TailwindCSS] (https://tailwindcss.com/docs/installation)
+* [TailwindCSS](https://tailwindcss.com/docs/installation)
 
 ## Acknowledgements
 
