@@ -56,9 +56,7 @@ const Assignments: React.FC<Assignment> = ({
   const handleDeleteClick = (assignment: Assignment, e: React.MouseEvent) => {
     e.stopPropagation();
     axios
-      //.delete(DELETE_PROJECT(unit_code, assignment.project_name))
-      //.delete(encodeURIComponent(DELETE_PROJECT(unit_code, assignment.project_name)))
-      .delete(DELETE_PROJECT(unit_code, encodeURIComponent(assignment.project_name)))
+      .delete(DELETE_PROJECT(unit_code, assignment.project_name))
       .then((response) => {
         setAssignments((prevAssignments) =>
           prevAssignments.filter((a) => a.project_id !== assignment.project_id)
