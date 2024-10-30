@@ -17,7 +17,7 @@ interface Unit {
 
 const UserDashboard = () => {
   const [units, setUnits] = useState<Unit[]>([]);
-  const convenerEmail = 'convener2@example.com'; // Replace with dynamic email if needed
+  const convenerEmail = 'convener1@example.com'; // Replace with dynamic email if needed
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleOpenPopup = () => {

@@ -56,7 +56,7 @@ export default function AssignmentDashboard({
         formData.append("files[]", file);
       });
 
-      formData.append("staff_email", "ta1@example.com");
+      formData.append("staff_email", "convener1@example.com");
 
       try {
         await axios.post(
