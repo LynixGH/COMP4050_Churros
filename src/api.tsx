@@ -1,5 +1,6 @@
 //Define the base URL for API
-export const BASE_URL = 'https://9pqmmu5b0a.execute-api.ap-southeast-2.amazonaws.com';
+//export const BASE_URL = 'https://9pqmmu5b0a.execute-api.ap-southeast-2.amazonaws.com';
+export const BASE_URL = 'http://3.106.214.31';
 
 //Endpoints
 
@@ -14,8 +15,11 @@ export const GET_ALL_UNITS = (staffEmail: string) =>
 //Projects
 export const POST_PROJECT = (unitCode: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects`;
 export const GET_PROJECTS = (unitCode: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects`;
-export const DELETE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}`;
-export const UPDATE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}`;
+export const DELETE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}`;
+export const UPDATE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}`;
+// export const DELETE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}`;
+// export const UPDATE_PROJECT = (unitCode: string, projectName: string) => `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}`;
+
 
 //Questions
 export const POST_QUESTION_TEMPLATE = (unitCode: string, projectName: string) =>
