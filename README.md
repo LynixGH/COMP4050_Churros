@@ -10,7 +10,7 @@ This codebase provides the frontend to the Espana division's solution to the cli
 
 First, set up the node modules:
 ```bash
-npm install next@latest react@latest react-dom@latest
+npm install
 ```
 
 Then, run the development server:
