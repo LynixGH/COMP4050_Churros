@@ -31,6 +31,9 @@ export const POST_QUESTION_BANK = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/question_bank`;
 export const GENERATE_ALL_QUESTIONS = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/generate_questions`;
+export const GENERATE_ONE_QUESTION = (unitCode: string, projectName: string, submissionId: number ) =>
+    `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/generate_questions/${submissionId}`;
+
 export const GET_GENERATED_QUESTIONS = (submissionId: number) =>
     `${BASE_URL}/questions/${submissionId}`;
 

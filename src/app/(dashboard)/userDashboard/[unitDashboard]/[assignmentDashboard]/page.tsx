@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import QuestionTemplate from "@/app/components/QuestionTemplate";
 import Link from "next/link";
-import { GET_SUBMISSIONS, BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS, GET_QUESTIONS_TEMPLATE } from '@/api';
+import { GET_SUBMISSIONS, BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS, GET_QUESTIONS_TEMPLATE, GENERATE_ONE_QUESTION } from '@/api';
 
 export default function AssignmentDashboard({
   params,
@@ -138,13 +138,14 @@ export default function AssignmentDashboard({
           )
         );
 
-        const response = await axios.post(
-          GENERATE_ALL_QUESTIONS(unitCode, decodeURIComponent(projectName)),
-          {
-            submission_ids: selectedSubmissions,
-          }
-        );
-        console.log("Questions generated successfully:", response.data);
+        // Loop through selected submissions and generate question for each one
+        for (const submissionId of selectedSubmissions) {
+          await axios.post(
+            GENERATE_ONE_QUESTION(unitCode, decodeURIComponent(projectName), submissionId)
+          );
+        }
+        console.log("Questions generated successfully for selected submissions.");
+        fetchSubmissions(); // Refresh submissions after generating questions
       } catch (err: any) {
         console.error("Error generating questions", err);
         setError("Failed to generate questions.");
