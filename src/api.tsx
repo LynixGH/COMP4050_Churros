@@ -1,6 +1,5 @@
 //Define the base URL for API
-export const BASE_URL = 'https://9pqmmu5b0a.execute-api.ap-southeast-2.amazonaws.com';
-//export const BASE_URL = 'http://3.106.214.31'; for local deploy
+export const BASE_URL = 'https://6h0dr0azk5.execute-api.ap-southeast-2.amazonaws.com/prod2';
 
 //Endpoints
 
