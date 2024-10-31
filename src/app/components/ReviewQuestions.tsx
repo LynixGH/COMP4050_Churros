@@ -100,7 +100,7 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
 
   const [activeTab, setActiveTab] = useState<"static" | "random" | "ai">(
-    "static"
+    "ai"
   );
 
   // State for selected reasons
@@ -215,48 +215,35 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
     // Payload preparation and API calls (unchanged)
     const payload = { question_reason: questionReasonArray };
 
+    console.log(payload)
+    
     try {
       const generateUrl = REGENERATE_QUESTIONS_FOR_ONE(unitCode, projectName, submissionId);
       await axios.post(generateUrl, payload);
+
+      console.log("THROUGH")
+      
+
 
       // Fetch updated questions after regeneration
       setLoading(true);
       const response = await axios.get(`${GET_GENERATED_QUESTIONS(submissionId)}`);
 
+      console.log("RES",response)
+
       if (response.status === 200 && response.data) {
         const regeneratedData: ReviewData[] = response.data;
-        const newQuestions = regeneratedData[regeneratedData.length - 1].ai_questions;
-
-        // Focus: Structure Update Only - Replace regenerated questions
-        setReviewData((prevReviewData) => {
-          if (prevReviewData) {
-            const updatedQuestions = { ...prevReviewData.ai_questions };
-
-            // Only update the specific questions that were regenerated
-            for (const [category, questions] of Object.entries(newQuestions)) {
-              if (updatedQuestions[category]) {
-                for (const [questionKey, questionText] of Object.entries(questions)) {
-                  // Replace only the selected and regenerated questions
-                  updatedQuestions[category][questionKey] = questionText;
-                }
-              }
-            }
-
-            return {
-              ...prevReviewData,
-              ai_questions: updatedQuestions, // Update the structure only
-            };
-          } else {
-            return regeneratedData[regeneratedData.length - 1]; // Return new data if no previous exists
-          }
-        });
-
-        // Clear selections (unchanged)
+      
+        // Simply update reviewData with the new data
+        setReviewData(regeneratedData[regeneratedData.length - 1]);
+      
+        // Clear selections (if necessary)
         setSelectedReasons({});
         setSelectedQuestions({});
       } else {
         console.error("Data not found after regeneration.");
       }
+      
     } catch (err) {
       console.error("Error regenerating selected questions:", err);
     } finally {
@@ -347,60 +334,51 @@ const ReviewQuestions: React.FC<ReviewQuestionsProps> = ({
 
       {/* Tab Content */}
       <div style={styles.tabContent}>
-        {activeTab === "static" && (
-          <>
-            {reviewData.static_questions && (
-              <table style={styles.table}>
-                <tbody>
-                  {reviewData.static_questions.map((question, index) => (
-                    <tr
-                      key={index}
-                      style={
-                        index % 2 === 0
-                          ? styles.tableRowEven
-                          : styles.tableRowOdd
-                      }
-                    >
-                      <td style={styles.questionText}>{question}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </>
-        )}
+      {activeTab === "static" && (
+  <>
+    {reviewData.static_questions && (
+      <table style={styles.table}>
+        <tbody>
+          {reviewData.static_questions.map((question, index) => (
+            <tr
+              key={index}
+              style={
+                index % 2 === 0
+                  ? styles.tableRowEven
+                  : styles.tableRowOdd
+              }
+            >
+              <td style={styles.questionText}>{question}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </>
+)}
 
-        {activeTab === "random" && (
-          <>
-            {/* Fetch Random Questions button for manual refresh */}
-            <button style={styles.randomButton} onClick={handleRandomButtonClick}>
-              Fetch Random Questions
-            </button>
-
-            {/* Render loading state or questions */}
-            {loading ? (
-              <p>Loading...</p>
-            ) : randomQuestions.length > 0 ? ( // Check if the array has questions
-              <table style={styles.table}>
-                <tbody>
-                  {randomQuestions.map((questionObj, index) => (
-                    <tr
-                      key={index} // Use index or another unique identifier for each question
-                      style={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}
-                    >
-                      <td style={styles.questionText}>{questionObj.question}</td> {/* Render question text */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No questions available.</p> // Display message if there are no questions
-            )}
-          </>
-        )}
-
-
-
+{activeTab === "random" && (
+  <>
+    {reviewData.random_questions && reviewData.random_questions.length > 0 ? ( // Display questions if available
+      <table style={styles.table}>
+        <tbody>
+          {reviewData.random_questions.map((questionObj, index) => (
+            <tr
+              key={index}
+              style={
+                index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd
+              }
+            >
+              <td style={styles.questionText}>{questionObj.question}</td> {/* Render question text */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p>No random questions available.</p> // Display message if no questions
+    )}
+  </>
+)}
 
         {activeTab === "ai" && (
           <>
