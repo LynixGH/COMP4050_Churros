@@ -23,13 +23,13 @@ const menuItems = [
         title: "",
       items: [
         
-        { //CHANGE FOR DARKMODE TOGGLE BUTTON
+        // { //CHANGE FOR DARKMODE TOGGLE BUTTON
             
-          icon: "/Dark Mode.png",
-          label: "DarkMode",
-          href: "/settings",
-          visible: ["admin", "teacher", "student", "parent"],
-        },
+        //   icon: "/Dark Mode.png",
+        //   label: "DarkMode",
+        //   href: "/settings",
+        //   visible: ["admin", "teacher", "student", "parent"],
+        // },
         {
           icon: "/logout.png",
           label: "Logout",
