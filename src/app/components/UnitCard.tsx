@@ -6,7 +6,7 @@ interface UnitProps {
   unit: {
     unit_code: string;
     unit_name: string;
-    year: string;
+    year: number;
     session: string;
   };
 }

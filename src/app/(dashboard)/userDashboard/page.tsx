@@ -64,7 +64,8 @@ const UserDashboard = () => {
     )
     .sort((a, b) => {
       if (a.year !== b.year) {
-        return parseInt(b.year) - parseInt(a.year); // Sort by year descending
+        //return parseInt(b.year) - parseInt(a.year); // Sort by year descending
+        return b.year - a.year; // Sort by year descending
       } else {
         return a.session === 'S2' && b.session === 'S1' ? -1 : 1; // Sort by session, S2 first
       }
