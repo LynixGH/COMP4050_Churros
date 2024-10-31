@@ -22,7 +22,7 @@ export const UPDATE_PROJECT = (unitCode: string, projectName: string) => `${BASE
 export const POST_QUESTION_TEMPLATE = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/template`;
 export const GET_QUESTIONS_TEMPLATE = (unitCode: string, projectName: string) =>
-    `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${encodeURIComponent(projectName)}/template`;
+    `${BASE_URL}/units/${encodeURIComponent(unitCode)}/projects/${projectName}/template`;
 
 export const GET_QUESTION_BANK = (unitCode: string, projectName: string) =>
     `${BASE_URL}/units/${(unitCode)}/projects/${(projectName)}/question_bank`;
