@@ -1,30 +1,13 @@
 /* Navbar.css */
 
 .navbar {
+    /* background-color: #A6192E; */
+    /* color: #A6192E; */
     padding: 1rem; /* Equivalent to p-4 */
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: background-color 0.3s, color 0.3s; /* Smooth transition */
-}
-
-.search-bar {
-    display: none; /* Hidden by default */
-    gap: 0.5rem; /* Equivalent to gap-2 */
-    border-radius: 9999px; /* Fully rounded */
-    padding: 0.5rem; /* Equivalent to px-2 */
-}
-
-.search-bar.visible {
-    display: flex; /* Show on medium screens and up */
-}
-
-.search-input {
-    width: 200px; /* Equivalent to w-[200px] */
-    padding: 0.5rem; /* Equivalent to p-2 */
-    background-color: transparent; /* bg-transparent */
-    outline: none;
-    transition: color 0.3s; /* Transition for input text color */
 }
 
 /* Light mode styles */

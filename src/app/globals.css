@@ -15,6 +15,15 @@ body,
     height: 100%;
     width: 100%;
 }
+
+/* nav {
+  background-color: #A6192E;
+} */
+
+h1, h2, h3 {
+  font-size: larger;
+}
+
 .tutorList {
     border: 1px solid #ccc;
     border-radius: 8px;

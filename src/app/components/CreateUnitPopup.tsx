@@ -66,7 +66,7 @@ const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose, convenerEmai
           </label>
           <button type="submit">Create Unit</button>
         </form>
-        <button onClick={onClose}>Close</button>
+        <button name="close" onClick={onClose}>Close</button>
       </div>
     </div>
   );

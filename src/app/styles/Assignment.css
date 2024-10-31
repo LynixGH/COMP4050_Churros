@@ -24,7 +24,7 @@
   .editButton {
     margin-top: 10px;
     padding: 8px 12px;
-    background-color: #007bff;
+    background-color: #A6192E;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -39,7 +39,7 @@
   
   .actionButton {
     padding: 8px 12px;
-    background-color: #dc3545;
+    background-color: #777877;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -81,7 +81,7 @@
   
   .saveButton {
     padding: 8px 16px;
-    background-color: #28a745;
+    background-color: #A6192E;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -90,7 +90,7 @@
   
   .cancelButton {
     padding: 8px 16px;
-    background-color: #dc3545;
+    background-color: #777877;
     color: #fff;
     border: none;
     border-radius: 4px;

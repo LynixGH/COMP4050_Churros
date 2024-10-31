@@ -69,7 +69,7 @@
 /* Buttons */
 .create-button {
     padding: 10px 15px;
-    background-color: #28a745;
+    background-color: #A6192E;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -77,22 +77,34 @@
     margin-right: 10px; /* Add some space between buttons */
 }
 
+.create-button:hover {
+    background-color: #76232F;
+}
+
 .upload-button {
     padding: 10px 15px;
-    background-color: #007bff;
+    background-color: #C5007D;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
+.upload-button:hover {
+    background-color: #7D215C;
+}
+
 .cancel-button {
     padding: 10px 15px;
-    background-color: #dc3545;
+    background-color: #777877;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.cancel-button:hover {
+    background-color: #505150;
 }
 
 /* Error Message */

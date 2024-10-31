@@ -173,7 +173,7 @@ const Tutors: React.FC<TutorsProps> = ({ unitCode }) => {
           <div key={tutor.id} style={styles.box}>
             <h3>{tutor.name}</h3>
             {isEditing && (
-              <button onClick={() => removeTutor(tutor.id)} style={styles.removeButton}>
+              <button className="remove-button" onClick={() => removeTutor(tutor.id)} style={styles.removeButton}>
                 Remove
               </button>
             )}
@@ -221,7 +221,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   manageButton: {
     padding: '10px 15px',
-    backgroundColor: '#007bff',
+    backgroundColor: '#A6192E',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
@@ -243,7 +243,7 @@ const styles: { [key: string]: CSSProperties } = {
   removeButton: {
     marginTop: '8px',
     padding: '5px 10px',
-    backgroundColor: '#dc3545',
+    backgroundColor: '#777877',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',

@@ -1,10 +1,18 @@
 /* UserDashboard.css */
 
 /* Container */
-.unit-dashboard {
+  .unit-dashboard {
     padding: 20px;
   }
   
+  .createButton {
+    float: right;
+  }
+
+  .units{
+    margin-top: 5%;
+  }
+
   /* Sections for Active and Inactive Units */
   .units-section {
     display: flex; /* Use flexbox for layout */
@@ -28,7 +36,7 @@
     border-radius: 8px;
     border: 1px solid #f5c6cb; /* Border color for inactive units */
   }
-  
+
   /* Unit Card Styling */
   .unit-card {
     border: 1px solid #ccc;
@@ -40,3 +48,6 @@
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   }
   
+  .unit-card:hover {
+    background-color: gainsboro;
+  }

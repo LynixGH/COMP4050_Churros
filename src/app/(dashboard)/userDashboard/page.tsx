@@ -72,30 +72,34 @@ const UserDashboard = () => {
 
   return (
     <div className="unit-dashboard">
-      <button onClick={handleOpenPopup}>Create New Unit</button>
-
-      {isPopupOpen && <CreateUnitPopup onClose={handleClosePopup} convenerEmail={convenerEmail} onUnitCreated={handleUnitCreated} />} {/* Pass the email and callback */}
-
-      <h2>Active Units</h2>
-      <div className="units-section active-units">
-        {activeUnits.length > 0 ? (
-          activeUnits.map((unit) => (
-            <UnitCard key={unit.unit_code} unit={unit} />
-          ))
-        ) : (
-          <p>No active units available.</p>
-        )}
+      <div className="createButton">
+        <button  className="createUnit" onClick={handleOpenPopup}>Create New Unit</button>
       </div>
 
-      <h2>Inactive Units</h2>
-      <div className="units-section inactive-units">
-        {inactiveUnits.length > 0 ? (
-          inactiveUnits.map((unit) => (
-            <UnitCard key={unit.unit_code} unit={unit} />
-          ))
-        ) : (
-          <p>No inactive units available.</p>
-        )}
+      {isPopupOpen && <CreateUnitPopup onClose={handleClosePopup} convenerEmail={convenerEmail} onUnitCreated={handleUnitCreated} />} {/* Pass the email and callback */}
+      
+      <div className="units"> 
+        <h2>Active Units</h2>
+        <div className="units-section active-units">
+          {activeUnits.length > 0 ? (
+            activeUnits.map((unit) => (
+              <UnitCard key={unit.unit_code} unit={unit} />
+            ))
+          ) : (
+            <p>No active units available.</p>
+          )}
+        </div>
+
+        <h2>Inactive Units</h2>
+        <div className="units-section inactive-units">
+          {inactiveUnits.length > 0 ? (
+            inactiveUnits.map((unit) => (
+              <UnitCard key={unit.unit_code} unit={unit} />
+            ))
+          ) : (
+            <p>No inactive units available.</p>
+          )}
+        </div>
       </div>
     </div>
   );
