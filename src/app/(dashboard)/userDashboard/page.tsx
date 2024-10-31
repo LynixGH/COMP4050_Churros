@@ -10,7 +10,7 @@ import { GET_ALL_UNITS } from '@/api'; // Import the GET_ALL_UNITS from API.tsx
 interface Unit {
   unit_code: string;
   unit_name: string;
-  year: string;
+  year: number; // Set year as a number type
   session: string;
   level: string;
 }
@@ -35,8 +35,8 @@ const UserDashboard = () => {
 
   // Get current year and session based on the current date
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear().toString();
-  const currentSession = currentDate.getMonth() < 6 ? 'S1' : 'S2'; // S1 for Jan-May, S2 for Jun-Dec
+  const currentYear = currentDate.getFullYear();
+  const currentSession = currentDate.getMonth() < 8 ? 'S1' : 'S2'; // S1 for Jan-May, S2 for Jun-Dec
 
   useEffect(() => {
     // Fetch the units from the backend using the GET_ALL_UNITS endpoint
