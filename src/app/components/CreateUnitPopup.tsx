@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '@/app/styles/CreateUnitPopup.css'; // Import CSS for the popup
+import '@/app/styles/CreateUnitPopup.css';
 import { POST_UNIT } from '@/api';
 
 interface CreateUnitPopupProps {
   onClose: () => void;
-  convenerEmail: string; // Email passed from UserDashboard
-  onUnitCreated: (newUnit: any) => void; // Callback to notify UserDashboard
+  convenerEmail: string;
+  onUnitCreated: (newUnit: any) => void;
 }
 
 const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose, convenerEmail, onUnitCreated }) => {
   const [unitCode, setUnitCode] = useState('');
   const [unitName, setUnitName] = useState('');
-  const [year, setYear] = useState('');
-  const [session, setSession] = useState('');
+  const [year, setYear] = useState(new Date().getFullYear()); // Default to current year
+  // Set default session based on the current month
+  // Get the current date
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth(); // Get current month (0-11)
+  const defaultSession = currentMonth < 8 ? 'S1' : 'S2'; // S1 for Jan-Aug, S2 for Sep-Dec
+  const [session, setSession] = useState(defaultSession); 
   const [level, setLevel] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,7 +27,7 @@ const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose, convenerEmai
     const newUnit = {
       unit_code: unitCode,
       unit_name: unitName,
-      convener_email: convenerEmail, // Use the email passed as prop
+      convener_email: convenerEmail,
       year,
       session,
       level,
@@ -31,13 +36,17 @@ const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose, convenerEmai
     try {
       const response = await axios.post(POST_UNIT, newUnit);
       alert('Unit created successfully');
-      onUnitCreated(response.data); // Notify UserDashboard to update units
-      onClose(); // Close the popup after submission
+      onUnitCreated(response.data);
+      onClose();
     } catch (error) {
       console.error('Failed to create unit', error);
       alert('Error creating unit');
     }
   };
+
+  // Generate a list of years from the current year, going back five years and forward two years
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 
   return (
     <div className="popup-container">
@@ -54,11 +63,21 @@ const CreateUnitPopup: React.FC<CreateUnitPopupProps> = ({ onClose, convenerEmai
           </label>
           <label>
             Year:
-            <input type="text" value={year} onChange={(e) => setYear(e.target.value)} required />
+            <select value={year} onChange={(e) => setYear(parseInt(e.target.value))} required>
+              {yearOptions.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Session:
-            <input type="text" value={session} onChange={(e) => setSession(e.target.value)} required />
+            <select value={session} onChange={(e) => setSession(e.target.value)} required>
+              <option value="S1">S1</option>
+              <option value="S2">S2</option>
+              <option value="S3">S3</option>
+            </select>
           </label>
           <label>
             Level:
