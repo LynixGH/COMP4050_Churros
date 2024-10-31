@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import QuestionTemplate from "@/app/components/QuestionTemplate"; // Import the new component
+import QuestionTemplate from "@/app/components/QuestionTemplate";
 import Link from "next/link";
 import { GET_SUBMISSIONS, BATCH_UPLOAD_SUBMISSIONS, GENERATE_ALL_QUESTIONS, GET_QUESTIONS_TEMPLATE } from '@/api';
 
@@ -13,37 +13,76 @@ export default function AssignmentDashboard({
 }) {
   const unitCode = params.unitDashboard;
   const projectName = params.assignmentDashboard;
-  const [unitName, setUnitName] = useState<string>(unitCode); // Use unit code from params
-  const [assignmentName, setAssignmentName] = useState<string>(projectName); // Use project name from params
+  const [unitName, setUnitName] = useState<string>(unitCode);
+  const [assignmentName, setAssignmentName] = useState<string>(projectName);
   const [submissions, setSubmissions] = useState<any[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null); // For multiple file selection
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
-  const [showTemplate, setShowTemplate] = useState<boolean>(false); // State to manage overlay visibility
-  const [templateSaved, setTemplateSaved] = useState<boolean>(false); // State to track if the template has been saved
-  const [showViewTemplatePopup, setShowViewTemplatePopup] = useState<boolean>(false); // State to control the View Template popup
-  const [questionTemplate, setQuestionTemplate] = useState<any>(null); // State to store question template data
+  const [showTemplate, setShowTemplate] = useState<boolean>(false);
+  const [templateSaved, setTemplateSaved] = useState<boolean>(false);
+  const [showViewTemplatePopup, setShowViewTemplatePopup] = useState<boolean>(false);
+  const [questionTemplate, setQuestionTemplate] = useState<any>(null);
+  const [prevSubmissionStatuses, setPrevSubmissionStatuses] = useState<{ [id: number]: string }>({});
 
   useEffect(() => {
     fetchSubmissions();
-  }, [unitCode, projectName]); // Dependency array updated
+    const interval = setInterval(checkSubmissionStatus, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [unitCode, projectName]);
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get(
-        GET_SUBMISSIONS(unitCode, projectName)
-      ); // Use dynamic URL
-      setSubmissions(response.data.submission_files);
+      const response = await axios.get(GET_SUBMISSIONS(unitCode, projectName));
+      const updatedSubmissions = response.data.submission_files.map((submission: any) => ({
+        ...submission,
+        submission_status: submission.submission_status === "uploaded" ? "Generating" : submission.submission_status
+      }));
+
+      setSubmissions(updatedSubmissions);
+      // Track initial statuses
+      const initialStatuses = Object.fromEntries(updatedSubmissions.map((sub: any) => [sub.submission_id, sub.submission_status]));
+      setPrevSubmissionStatuses(initialStatuses);
     } catch (err) {
       console.error("Error fetching submissions", err);
       setError("Failed to fetch submissions.");
     }
   };
 
+  const checkSubmissionStatus = async () => {
+    try {
+      const response = await axios.get(GET_SUBMISSIONS(unitCode, projectName));
+      const updatedSubmissions = response.data.submission_files;
+
+      // Only refresh if a submission status changes from "Generating" to "GENERATED"
+      let shouldRefresh = false;
+      const newStatuses = { ...prevSubmissionStatuses };
+      updatedSubmissions.forEach((submission: any) => {
+        if (submission.submission_status === "GENERATED" && prevSubmissionStatuses[submission.submission_id] === "Generating") {
+          shouldRefresh = true;
+        }
+        newStatuses[submission.submission_id] = submission.submission_status;
+      });
+
+      // Update the previous statuses
+      setPrevSubmissionStatuses(newStatuses);
+
+      if (shouldRefresh) {
+        setSubmissions(updatedSubmissions);
+        window.location.reload();
+      } else {
+        setSubmissions(updatedSubmissions);
+      }
+    } catch (err) {
+      console.error("Error checking submission status", err);
+    }
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFiles(event.target.files); // Allow multiple files selection
+      setSelectedFiles(event.target.files);
       setError(null);
     }
   };
@@ -90,6 +129,15 @@ export default function AssignmentDashboard({
   const handleGenerateQuestions = async () => {
     if (selectedSubmissions.length > 0) {
       try {
+        // Update status of selected submissions to "Generating"
+        setSubmissions(prevSubmissions =>
+          prevSubmissions.map(submission =>
+            selectedSubmissions.includes(submission.submission_id)
+              ? { ...submission, submission_status: "Generating" }
+              : submission
+          )
+        );
+
         const response = await axios.post(
           GENERATE_ALL_QUESTIONS(unitCode, decodeURIComponent(projectName)),
           {
@@ -112,7 +160,6 @@ export default function AssignmentDashboard({
     }
   };
 
-  // Fetch the question template data when opening the View Template popup
   const handleViewTemplate = async () => {
     try {
       const response = await axios.get(GET_QUESTIONS_TEMPLATE(unitCode, projectName));
@@ -124,7 +171,6 @@ export default function AssignmentDashboard({
     }
   };
 
-  // Function to reset template saved state
   const resetTemplateSaved = () => {
     setTemplateSaved(false);
   };
@@ -158,7 +204,7 @@ export default function AssignmentDashboard({
             onClick={() => {
               setShowTemplate(true);
               if (!templateSaved) {
-                setTemplateSaved(true); // Set template saved to true when opening for the first time
+                setTemplateSaved(true);
               }
             }}
             className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
@@ -245,14 +291,13 @@ export default function AssignmentDashboard({
         <QuestionTemplate
           onClose={() => {
             setShowTemplate(false);
-            resetTemplateSaved(); // Reset the template saved state when closing
+            resetTemplateSaved();
           }}
           unitCode={unitCode}
           projectName={projectName}
         />
       )}
 
-      {/* View Question Template Popup */}
       {showViewTemplatePopup && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg shadow-lg w-3/4 max-w-lg">
