@@ -158,7 +158,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   cancelButton: {
     padding: '10px 15px',
-    backgroundColor: '#dc3545',
+    backgroundColor: '#A6192E',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',

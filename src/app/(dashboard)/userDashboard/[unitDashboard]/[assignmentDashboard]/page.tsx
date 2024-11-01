@@ -190,7 +190,7 @@ export default function AssignmentDashboard({
         />
         <button
           onClick={handleUpload}
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-600 text-white px-4 py-2 rounded"
           disabled={loading}
         >
           {loading ? "Uploading..." : "Upload Submission"}
@@ -208,19 +208,19 @@ export default function AssignmentDashboard({
                 setTemplateSaved(true);
               }
             }}
-            className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+            className="bg-pink-700 text-white px-4 py-2 rounded mr-2"
           >
             {templateSaved ? "Edit Question Template" : "Question Template"}
           </button>
           <button
             onClick={handleViewTemplate}
-            className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+            className="bg-red-800 text-white px-4 py-2 rounded mr-2"
           >
             View Question Template
           </button>
           <button
             onClick={handleGenerateQuestions}
-            className="bg-blue-500 text-white px-4 py-2 rounded mr-10"
+            className="bg-red-800 text-white px-4 py-2 rounded mr-10"
           >
             Generate Questions
           </button>
@@ -308,7 +308,7 @@ export default function AssignmentDashboard({
             </pre>
             <button
               onClick={() => setShowViewTemplatePopup(false)}
-              className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+              className="bg-red-800 text-white px-4 py-2 rounded mt-4"
             >
               Close
             </button>

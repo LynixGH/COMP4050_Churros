@@ -537,7 +537,8 @@ const styles: { [key: string]: CSSProperties } = {
   activeTab: {
     padding: "12px 24px",
     margin: "0 8px",
-    backgroundColor: "#fff",
+    backgroundColor: "#A6192E",
+    color: "#fff",
     border: "1px solid #ccc",
     borderBottom: "none",
     borderRadius: "4px 4px 0 0",
@@ -597,8 +598,8 @@ const styles: { [key: string]: CSSProperties } = {
   },
   regenButton: {
     padding: "10px 20px",
-    backgroundColor: "#ffc107",
-    color: "#000",
+    backgroundColor: "#C5007D",
+    color: "#fff",
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",

@@ -213,7 +213,7 @@ const styles: { [key: string]: CSSProperties } = {
   editButton: {
     marginTop: "10px",
     padding: "8px 12px",
-    backgroundColor: "#007bff",
+    backgroundColor: "#A6192E",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -226,7 +226,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   actionButton: {
     padding: "8px 12px",
-    backgroundColor: "#dc3545",
+    backgroundColor: "#A6192E",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -263,7 +263,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   saveButton: {
     padding: "8px 16px",
-    backgroundColor: "#28a745",
+    backgroundColor: "#43A047",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -271,7 +271,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   cancelButton: {
     padding: "8px 16px",
-    backgroundColor: "#dc3545",
+    backgroundColor: "#777877",
     color: "#fff",
     border: "none",
     borderRadius: "4px",

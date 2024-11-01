@@ -157,7 +157,7 @@ const QuestionTemplate: React.FC<templateProps> = ({ onClose, unitCode, projectN
               </label>
               <button
                 onClick={() => handleRemoveQuestion(index)}
-                className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
+                className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs"
               >
                 Remove
               </button>
@@ -166,7 +166,7 @@ const QuestionTemplate: React.FC<templateProps> = ({ onClose, unitCode, projectN
         ))}
         <button
           onClick={handleAddQuestion}
-          className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+          className="bg-red-800 text-white px-4 py-2 rounded mb-4"
         >
           Add Question
         </button>
@@ -312,13 +312,13 @@ const QuestionTemplate: React.FC<templateProps> = ({ onClose, unitCode, projectN
       <div className="flex justify-center w-full absolute bottom-4">
         <button
           onClick={handleSave}
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-600 text-white px-4 py-2 rounded"
         >
           Save
         </button>
         <button
           onClick={onClose}
-          className="bg-red-500 text-white px-4 py-2 rounded ml-4"
+          className="bg-red-800 text-white px-4 py-2 rounded ml-4"
         >
           Close
         </button>

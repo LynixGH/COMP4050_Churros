@@ -221,7 +221,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   manageButton: {
     padding: '10px 15px',
-    backgroundColor: '#007bff',
+    backgroundColor: '#A6192E',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
