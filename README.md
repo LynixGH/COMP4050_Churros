@@ -4,7 +4,7 @@
 
 This is the Github Repository of the COMP4050 2024 Session 2 Churros team in the Espana division. The code base is created using the next.js framework. It was worked on by Mark Ghaby, Thomas Bevan, Vivian Wu, Darrell Jun Zhen Lim & Keval Kaushalbhai Gandhi.
 
-This codebase provides the frontend to the Espana division's solution to the client issue proposed to us at the beginning of the semester. It ultimately provides the user interface to interact with the VivaMQ system which has authentication capabilities, and the ability to create units and assignments for viva voce assignment creation, based on other students submissions. There is also the capabilities of creating a rubric for an assignment based on a description, criterions and ULOs, as well as the ability to convert an existing marking guide to a marking rubric. The true power comes from this all being powered by AI, which the Capote team handled.
+This codebase provides the frontend to the Espana division's solution to the client issue proposed to us at the beginning of the semester. It ultimately provides the user interface to interact with the VivaMQ system which has authentication capabilities, and the ability to create units and assignments for viva voce assignment creation, based on other students submissions. There is also the capabilities of creating a rubric for an assignment based on a description, criterions and Unit Learning Outcomes (ULOs), as well as the ability to convert an existing marking guide to a marking rubric. The true power comes from this all being powered by AI, which the Capote team handled.
 
 ## Build Instructions
 
@@ -36,7 +36,7 @@ The list of third-party code is as below:
 
 ## Acknowledgements
 
-We would like to acknowledge Asngar and Kate for putting the unit together as well as supervising and providing us guidance throughout the semester. We would also like to acknowledge, Carl, Luke and Matt for acting as clients to simulate real-world experiences and provide us with the opportunity to learn from. Additionally, we would like to acknowledge Suhaas Gambhir from the Capote team, Mifta Alam and Himanshi Garg from the Cordoba team for their contributions and assistance to the creation of this codebase. 
+We would like to acknowledge Ansgar and Kate for putting the unit together as well as supervising and providing us guidance throughout the semester. We would also like to acknowledge, Carl, Luke and Matt for acting as clients to simulate real-world experiences and provide us with the opportunity to learn from. Additionally, we would like to acknowledge Suhaas Gambhir from the Capote team, Mifta Alam and Himanshi Garg from the Cordoba team for their contributions and assistance to the creation of this codebase. 
 
 ## Codebase Description
 
